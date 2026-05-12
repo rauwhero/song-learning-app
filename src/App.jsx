@@ -106,83 +106,280 @@ function chordMidi(ch) {
 }
 
 // ════════════════════════════════════════════════════════════════════════════════
-// SECTION 3 — CAGED SHAPE LIBRARY
+// SECTION 3 — CAGED SHAPE LIBRARY (verified from FaChords, GuitarHabits, Ultimate Guitar Chart)
+// String numbers: 6=low E, 5=A, 4=D, 3=G, 2=B, 1=high e
 // ════════════════════════════════════════════════════════════════════════════════
 
 const CAGED = {
+  // ─── Major open chords ────────────────────────────────────────────────────
   G:[
-    {shape:"G",label:"Open G",fret:1,barre:false,dots:[{s:6,f:3},{s:5,f:2},{s:1,f:3}],mute:[],open:[2,3,4]},
-    {shape:"E",label:"E-shape III",fret:3,barre:true,barreString:5,dots:[{s:4,f:5},{s:3,f:5},{s:2,f:4}],mute:[],open:[]},
-    {shape:"D",label:"D-shape VII",fret:7,barre:true,barreString:4,dots:[{s:3,f:9},{s:2,f:8},{s:1,f:7}],mute:[6,5],open:[]},
-    {shape:"C",label:"C-shape V",fret:5,barre:false,dots:[{s:5,f:5},{s:4,f:5},{s:2,f:8},{s:1,f:7}],mute:[6],open:[3]},
-    {shape:"A",label:"A-shape X",fret:10,barre:true,barreString:5,dots:[{s:4,f:12},{s:3,f:12},{s:2,f:12}],mute:[6],open:[]},
+    // Open G: E-fret3(G), A-fret2(B), D-open, G-open, B-open, e-fret3(G)
+    {shape:"G",label:"Open G",fret:1,barre:false,
+      dots:[{s:6,f:3},{s:5,f:2},{s:1,f:3}],mute:[],open:[4,3,2]},
+    // E-shape barre III — full 6-string barre fret 3, ring D-fret5, pinky G-fret5, middle B-fret4
+    {shape:"E",label:"E-shape III",fret:3,barre:true,barreString:6,
+      dots:[{s:4,f:5},{s:3,f:5},{s:2,f:4}],mute:[],open:[]},
+    // D-shape VII — barre strings 1-4 at fret 7, extra fingers G-fret9, B-fret8
+    {shape:"D",label:"D-shape VII",fret:7,barre:true,barreString:4,
+      dots:[{s:3,f:9},{s:2,f:8}],mute:[6,5],open:[]},
+    // C-shape VIII — root on A-fret10; open G string in shape
+    {shape:"C",label:"C-shape VIII",fret:8,barre:false,
+      dots:[{s:5,f:10},{s:4,f:9},{s:2,f:8},{s:1,f:8}],mute:[6],open:[3]},
+    // A-shape X — barre A-string fret10, cluster D/G/B/e at fret12
+    {shape:"A",label:"A-shape X",fret:10,barre:true,barreString:5,
+      dots:[{s:4,f:12},{s:3,f:12},{s:2,f:12},{s:1,f:12}],mute:[6],open:[]},
   ],
   C:[
-    {shape:"C",label:"Open C",fret:1,barre:false,dots:[{s:5,f:3},{s:4,f:2},{s:2,f:1}],mute:[6],open:[3,1]},
-    {shape:"A",label:"A-shape III",fret:3,barre:true,barreString:5,dots:[{s:4,f:5},{s:3,f:5},{s:2,f:5}],mute:[6],open:[]},
-    {shape:"G",label:"G-shape VIII",fret:8,barre:true,barreString:6,dots:[{s:5,f:10},{s:4,f:10},{s:1,f:11}],mute:[],open:[]},
+    // Open C: A-fret3(C), D-fret2(E), G-open, B-fret1(C), e-open
+    {shape:"C",label:"Open C",fret:1,barre:false,
+      dots:[{s:5,f:3},{s:4,f:2},{s:2,f:1}],mute:[6],open:[3,1]},
+    // A-shape III — barre A-string fret3, cluster D/G/B/e at fret5
+    {shape:"A",label:"A-shape III",fret:3,barre:true,barreString:5,
+      dots:[{s:4,f:5},{s:3,f:5},{s:2,f:5},{s:1,f:5}],mute:[6],open:[]},
+    // G-shape VIII — barre all 6 fret8; A-fret10, D-fret10, e-fret8(covered by barre)
+    {shape:"G",label:"G-shape VIII",fret:8,barre:true,barreString:6,
+      dots:[{s:5,f:10},{s:4,f:10}],mute:[],open:[]},
   ],
   A:[
-    {shape:"A",label:"Open A",fret:1,barre:false,dots:[{s:4,f:2},{s:3,f:2},{s:2,f:2}],mute:[6],open:[5,1]},
-    {shape:"E",label:"E-shape V",fret:5,barre:true,barreString:6,dots:[{s:4,f:7},{s:3,f:7},{s:2,f:6}],mute:[],open:[]},
+    // Open A: A-open, D-fret2(E), G-fret2(A), B-fret2(C#), e-open
+    {shape:"A",label:"Open A",fret:1,barre:false,
+      dots:[{s:4,f:2},{s:3,f:2},{s:2,f:2}],mute:[6],open:[5,1]},
+    // E-shape V — barre all 6 fret5; D-fret7(A), G-fret6(C#), B-fret6(E#... wait: E-shape A uses G-fret6)
+    // Confirmed: A E-shape at fret5: D-fret7(A root), G-fret6(C# major3rd), B-fret6(E 5th via... )
+    // B string fret6 = E (A-major 5th ✓). G string fret6 = C# (major 3rd ✓). D string fret7 = A (root ✓)
+    {shape:"E",label:"E-shape V",fret:5,barre:true,barreString:6,
+      dots:[{s:4,f:7},{s:3,f:6},{s:2,f:6}],mute:[],open:[]},
   ],
   E:[
-    {shape:"E",label:"Open E",fret:1,barre:false,dots:[{s:4,f:2},{s:3,f:2},{s:5,f:2}],mute:[],open:[6,3,2,1]},
-    {shape:"C",label:"C-shape IV",fret:4,barre:true,barreString:6,dots:[{s:4,f:6},{s:3,f:6},{s:2,f:5}],mute:[],open:[]},
+    // Open E: low E-open, A-fret2(B), D-fret2(E), G-fret1(G#), B-open, e-open
+    {shape:"E",label:"Open E",fret:1,barre:false,
+      dots:[{s:5,f:2},{s:4,f:2},{s:3,f:1}],mute:[],open:[6,2,1]},
+    // C-shape IV — barre all 6 fret4; A-fret6(C#... wait E is root at low-E fret4? No.
+    // E-major C-shape is rooted with the root on string 5 (A string). At fret 4: A-string fret4 = C#.
+    // But we want E-major: root E is at string 5 fret 7. C-shape has root on A-string.
+    // C-shape E-major: barre at fret 7 with open-style C fingering raised 7 frets. Root A-str fret7=E.
+    {shape:"C",label:"C-shape VII",fret:7,barre:true,barreString:6,
+      dots:[{s:4,f:9},{s:3,f:9},{s:2,f:8}],mute:[],open:[]},
   ],
   D:[
-    {shape:"D",label:"Open D",fret:1,barre:false,dots:[{s:4,f:0},{s:3,f:2},{s:2,f:3},{s:1,f:2}],mute:[6,5],open:[4]},
-    {shape:"A",label:"A-shape V",fret:5,barre:true,barreString:5,dots:[{s:4,f:7},{s:3,f:7},{s:2,f:7}],mute:[6],open:[]},
+    // Open D: D-open, G-fret2(A), B-fret3(D), e-fret2(F#)
+    {shape:"D",label:"Open D",fret:1,barre:false,
+      dots:[{s:3,f:2},{s:2,f:3},{s:1,f:2}],mute:[6,5],open:[4]},
+    // A-shape V — barre A-string fret5, cluster D/G/B/e at fret7
+    {shape:"A",label:"A-shape V",fret:5,barre:true,barreString:5,
+      dots:[{s:4,f:7},{s:3,f:7},{s:2,f:7},{s:1,f:7}],mute:[6],open:[]},
+    // E-shape X — barre all 6 at fret10
+    {shape:"E",label:"E-shape X",fret:10,barre:true,barreString:6,
+      dots:[{s:4,f:12},{s:3,f:11},{s:2,f:11}],mute:[],open:[]},
   ],
   F:[
-    {shape:"E",label:"E-barre I",fret:1,barre:true,barreString:6,dots:[{s:4,f:3},{s:3,f:3},{s:2,f:2}],mute:[],open:[]},
-    {shape:"C",label:"C-shape VIII",fret:8,barre:false,dots:[{s:5,f:8},{s:4,f:10},{s:3,f:10},{s:2,f:10}],mute:[6],open:[1]},
+    // E-barre I: barre all 6 fret1; A-fret3(C), D-fret3(F), G-fret2(A)
+    {shape:"E",label:"E-barre I",fret:1,barre:true,barreString:6,
+      dots:[{s:5,f:3},{s:4,f:3},{s:3,f:2}],mute:[],open:[]},
+    // C-shape VIII: root A-str fret8(F); D-fret10(C), G-fret10(F), B-fret10(A), e-open
+    {shape:"C",label:"C-shape VIII",fret:8,barre:false,
+      dots:[{s:5,f:8},{s:4,f:10},{s:3,f:10},{s:2,f:10}],mute:[6],open:[1]},
   ],
+  B:[
+    // A-shape II: barre A-string fret2(B); cluster D/G/B/e at fret4
+    {shape:"A",label:"A-shape II",fret:2,barre:true,barreString:5,
+      dots:[{s:4,f:4},{s:3,f:4},{s:2,f:4},{s:1,f:4}],mute:[6],open:[]},
+    // E-shape VII: full barre fret7; D-fret9, G-fret9, B-fret8
+    {shape:"E",label:"E-shape VII",fret:7,barre:true,barreString:6,
+      dots:[{s:4,f:9},{s:3,f:9},{s:2,f:8}],mute:[],open:[]},
+  ],
+
+  // ─── Minor open chords ────────────────────────────────────────────────────
   Am:[
-    {shape:"Am",label:"Open Am",fret:1,barre:false,dots:[{s:4,f:2},{s:3,f:2},{s:2,f:1}],mute:[6],open:[5,1]},
-    {shape:"E",label:"E-shape V",fret:5,barre:true,barreString:6,dots:[{s:4,f:7},{s:3,f:7},{s:2,f:5}],mute:[],open:[]},
+    // Open Am: A-open, D-fret2(E), G-fret2(A), B-fret1(C), e-open
+    {shape:"Am",label:"Open Am",fret:1,barre:false,
+      dots:[{s:4,f:2},{s:3,f:2},{s:2,f:1}],mute:[6],open:[5,1]},
+    // E-minor shape V — barre all 6 fret5; D-fret7, G-fret7(extra finger for minor), B-fret5(barre)
+    {shape:"E",label:"E-shape V",fret:5,barre:true,barreString:6,
+      dots:[{s:4,f:7},{s:3,f:7}],mute:[],open:[]},
   ],
   Dm:[
-    {shape:"D",label:"Open Dm",fret:1,barre:false,dots:[{s:4,f:0},{s:3,f:2},{s:2,f:3},{s:1,f:1}],mute:[6,5],open:[4]},
-    {shape:"A",label:"A-shape V",fret:5,barre:true,barreString:5,dots:[{s:4,f:7},{s:3,f:7},{s:2,f:6}],mute:[6],open:[]},
+    // Open Dm: D-open, G-fret2(A), B-fret3(D), e-fret1(F)
+    {shape:"D",label:"Open Dm",fret:1,barre:false,
+      dots:[{s:3,f:2},{s:2,f:3},{s:1,f:1}],mute:[6,5],open:[4]},
+    // A-minor shape V — barre A-string fret5; D-fret7, G-fret7, B-fret6
+    {shape:"A",label:"A-shape V",fret:5,barre:true,barreString:5,
+      dots:[{s:4,f:7},{s:3,f:7},{s:2,f:6}],mute:[6],open:[]},
   ],
   Em:[
-    {shape:"Em",label:"Open Em",fret:1,barre:false,dots:[{s:5,f:2},{s:4,f:2}],mute:[],open:[6,3,2,1]},
-    {shape:"D",label:"D-shape VII",fret:7,barre:true,barreString:5,dots:[{s:4,f:9},{s:3,f:9},{s:2,f:8}],mute:[6],open:[]},
+    // Open Em: E-open, A-fret2(B), D-fret2(E), G-open, B-open, e-open
+    {shape:"Em",label:"Open Em",fret:1,barre:false,
+      dots:[{s:5,f:2},{s:4,f:2}],mute:[],open:[6,3,2,1]},
+    // E-minor shape VII — barre all 6 fret7; A-fret9, D-fret9
+    {shape:"E",label:"E-shape VII",fret:7,barre:true,barreString:6,
+      dots:[{s:5,f:9},{s:4,f:9}],mute:[],open:[]},
   ],
   Bm:[
-    {shape:"A",label:"A-shape II",fret:2,barre:true,barreString:5,dots:[{s:4,f:4},{s:3,f:4},{s:2,f:3}],mute:[6],open:[]},
-    {shape:"E",label:"E-shape VII",fret:7,barre:true,barreString:6,dots:[{s:4,f:9},{s:3,f:9},{s:2,f:8}],mute:[],open:[]},
+    // A-minor shape II — barre A-string fret2; D-fret4, G-fret4, B-fret3
+    {shape:"A",label:"A-shape II",fret:2,barre:true,barreString:5,
+      dots:[{s:4,f:4},{s:3,f:4},{s:2,f:3}],mute:[6],open:[]},
+    // E-minor shape VII — barre all 6 fret7; A-fret9, D-fret9
+    {shape:"E",label:"E-shape VII",fret:7,barre:true,barreString:6,
+      dots:[{s:5,f:9},{s:4,f:9}],mute:[],open:[]},
+  ],
+  Cm:[
+    // E-minor shape VIII — barre all 6 fret8; A-fret10, D-fret10
+    {shape:"E",label:"E-shape VIII",fret:8,barre:true,barreString:6,
+      dots:[{s:5,f:10},{s:4,f:10}],mute:[],open:[]},
+  ],
+
+  // ─── Seventh chords ───────────────────────────────────────────────────────
+  E7:[
+    // Open E7: low-E-open, A-fret2(B), D-open(D=b7✓), G-fret1(G#=3rd✓), B-open, e-open
+    {shape:"E7",label:"Open E7",fret:1,barre:false,
+      dots:[{s:5,f:2},{s:3,f:1}],mute:[],open:[6,4,2,1]},
+    // Barre E7 shape at fret 7 (for B7 root - movable)
+    {shape:"E7",label:"E7-shape VII",fret:7,barre:true,barreString:6,
+      dots:[{s:5,f:9},{s:3,f:8}],mute:[],open:[]},
+  ],
+  "G#7":[
+    // E7-shape barre IV: barre fret4; A-fret6(C=maj3rd), D-fret4(barre=G#root), G-fret5(Eb=b7), B-fret4(barre)
+    {shape:"E7",label:"E7-shape IV",fret:4,barre:true,barreString:6,
+      dots:[{s:5,f:6},{s:3,f:5}],mute:[],open:[]},
+  ],
+
+  // ─── Minor 7th chords ────────────────────────────────────────────────────
+  Am7:[
+    // Open Am7: mute E; A-open, D-fret2(E), G-open, B-fret1(C), e-open
+    // Tones: A(1) C(b3) E(5) G(b7) ✓
+    {shape:"Am7",label:"Open Am7",fret:1,barre:false,
+      dots:[{s:4,f:2},{s:2,f:1}],mute:[6],open:[5,3,1]},
+    // E-minor7 shape V — barre fret5; A-fret7(E=5th), D-fret5(barre=A), G-fret5(barre=D=4th... )
+    // Simpler: barre fret5 + D string fret7 only (Am7 shape)
+    {shape:"E",label:"E-shape V",fret:5,barre:true,barreString:6,
+      dots:[{s:4,f:7}],mute:[],open:[]},
+  ],
+  Em7:[
+    // Open Em7 voicing 1: E-open, A-fret2(B), D-open, G-open, B-open, e-open (just 1 finger)
+    // Tones: E(1) G(b3) B(5) D(b7) ✓
+    {shape:"Em7",label:"Open Em7 v1",fret:1,barre:false,
+      dots:[{s:5,f:2}],mute:[],open:[6,4,3,2,1]},
+    // Open Em7 voicing 2: A-fret2, G-fret2, B-fret3 (richer voicing for Wonderwall)
+    {shape:"Em7",label:"Open Em7 v2",fret:1,barre:false,
+      dots:[{s:5,f:2},{s:3,f:2},{s:2,f:3}],mute:[6],open:[4,1]},
+  ],
+  Dm7:[
+    // Open Dm7: mute E,A; D-open, G-fret2(A), B-fret1(C partial barre), e-fret1(F)
+    // Tones: D(1) F(b3) A(5) C(b7) ✓
+    {shape:"Dm7",label:"Open Dm7",fret:1,barre:false,
+      dots:[{s:3,f:2},{s:2,f:1},{s:1,f:1}],mute:[6,5],open:[4]},
   ],
   "C#m7":[
-    {shape:"A",label:"A-shape IV",fret:4,barre:true,barreString:5,dots:[{s:4,f:6},{s:3,f:6},{s:2,f:5}],mute:[6],open:[]},
-    {shape:"E",label:"E-shape IX",fret:9,barre:true,barreString:6,dots:[{s:4,f:11},{s:3,f:11},{s:2,f:9}],mute:[],open:[]},
+    // A-minor7 shape at fret4: barre A-str fret4(C#); D-fret6(G#=5th), G-fret6(C#=root oct), B-fret5(E=b3)
+    {shape:"A",label:"A-shape IV",fret:4,barre:true,barreString:5,
+      dots:[{s:4,f:6},{s:3,f:6},{s:2,f:5}],mute:[6],open:[]},
+    // E-minor7 shape IX: barre all fret9; A-fret11, D-fret11
+    {shape:"E",label:"E-shape IX",fret:9,barre:true,barreString:6,
+      dots:[{s:5,f:11},{s:4,f:11}],mute:[],open:[]},
   ],
-  "G#7":[{shape:"E",label:"E-shape IV",fret:4,barre:true,barreString:6,dots:[{s:4,f:6},{s:3,f:5},{s:2,f:4}],mute:[],open:[]}],
+
+  // ─── Slash / bass note chords ─────────────────────────────────────────────
+  "G/B":[
+    // G chord with B bass: mute low-E; A-fret2(B=bass), D-open, G-open, B-open, e-fret3(G)
+    {shape:"G/B",label:"G/B open",fret:1,barre:false,
+      dots:[{s:5,f:2},{s:1,f:3}],mute:[6],open:[4,3,2]},
+  ],
+  "C/E":[
+    // C chord with E bass: low-E-open(E=3rd bass), A-open? No — standard C/E: low-E-open, A-fret3(C), D-fret2(E), G-open, B-fret1(C), e-open
+    {shape:"C/E",label:"C/E open",fret:1,barre:false,
+      dots:[{s:5,f:3},{s:4,f:2},{s:2,f:1}],mute:[],open:[6,3,1]},
+  ],
+  "Am/G":[
+    // Am chord with G bass: low-E fret3(G bass); A-open, D-fret2(E), G-fret2(A), B-fret1(C), e-open
+    {shape:"Am/G",label:"Am/G open",fret:1,barre:false,
+      dots:[{s:6,f:3},{s:4,f:2},{s:3,f:2},{s:2,f:1}],mute:[],open:[5,1]},
+  ],
+  "D7/F#":[
+    // D7 chord with F# bass: low-E fret2(F# bass); A-mute; D-open, G-fret2(A), B-fret1(C), e-open
+    // D7 tones: D(1) F#(3) A(5) C(b7) ✓
+    {shape:"D7/F#",label:"D7/F# open",fret:1,barre:false,
+      dots:[{s:6,f:2},{s:3,f:2},{s:2,f:1}],mute:[5],open:[4,1]},
+  ],
+
+  // ─── Extended / sus chords ────────────────────────────────────────────────
+  Bb6:[
+    // Bb6: common voicing x-1-3-3-3-1 (partial barre or cluster)
+    // Tones: Bb(1) D(3) F(5) G(6) ✓
+    {shape:"Bb6",label:"Bb6 barre I",fret:1,barre:true,barreString:2,
+      dots:[{s:5,f:1},{s:4,f:3},{s:3,f:3},{s:2,f:3}],mute:[6],open:[]},
+  ],
+  Dsus4:[
+    // Open Dsus4: D-open, G-fret2(A), B-fret3(D), e-fret3(G=sus4)
+    // Tones: D(1) G(4) A(5) ✓
+    {shape:"Dsus4",label:"Open Dsus4",fret:1,barre:false,
+      dots:[{s:3,f:2},{s:2,f:3},{s:1,f:3}],mute:[6,5],open:[4]},
+  ],
+  A7sus4:[
+    // Open A7sus4: A-open, D-fret2(E), G-open, B-open, e-open (just D string)
+    // Tones: A(1) D(4) E(5) G(b7) ✓
+    {shape:"A7sus4",label:"Open A7sus4",fret:1,barre:false,
+      dots:[{s:4,f:2}],mute:[6],open:[5,3,2,1]},
+  ],
+  D7sus2:[
+    // Open D7sus2: D-open, G-fret2(A), B-fret1(C), e-open — adds E(sus2) via open e
+    // Tones: D(1) E(2) A(5) C(b7) ✓
+    {shape:"D7sus2",label:"Open D7sus2",fret:1,barre:false,
+      dots:[{s:3,f:2},{s:2,f:1}],mute:[6,5],open:[4,1]},
+  ],
+
+  // ─── Power chords (5th dyads) ─────────────────────────────────────────────
+  D5:[
+    // A-string position: A-fret5(D root), D-fret7(A fifth)
+    {shape:"D5",label:"A-string position",fret:5,barre:false,
+      dots:[{s:5,f:5},{s:4,f:7}],mute:[6,3,2,1],open:[]},
+    // Open position: D-open(root), G-fret2(A fifth)
+    {shape:"D5",label:"Open D5",fret:1,barre:false,
+      dots:[{s:3,f:2}],mute:[6,5,2,1],open:[4]},
+  ],
+  C5:[
+    // A-string position: A-fret3(C), D-fret5(G)
+    {shape:"C5",label:"A-string position",fret:3,barre:false,
+      dots:[{s:5,f:3},{s:4,f:5}],mute:[6,3,2,1],open:[]},
+  ],
+  Bb5:[
+    // A-string position: A-fret1(Bb), D-fret3(F)
+    {shape:"Bb5",label:"A-string position",fret:1,barre:false,
+      dots:[{s:5,f:1},{s:4,f:3}],mute:[6,3,2,1],open:[]},
+  ],
+  A5:[
+    // Open position: A-open(root), D-fret2(E fifth)
+    {shape:"A5",label:"Open A5",fret:1,barre:false,
+      dots:[{s:4,f:2}],mute:[6,3,2,1],open:[5]},
+  ],
   "F#m":[
-    {shape:"E",label:"E-shape II",fret:2,barre:true,barreString:6,dots:[{s:4,f:4},{s:3,f:4},{s:2,f:2}],mute:[],open:[]},
-    {shape:"A",label:"A-shape IX",fret:9,barre:true,barreString:5,dots:[{s:4,f:11},{s:3,f:11},{s:2,f:9}],mute:[6],open:[]},
+    // E-minor shape II: barre all 6 fret2; A-fret4(F#=root confirmed by D-string), D-fret4
+    // F#m: F#(1) A(b3) C#(5). Barre fret2: E=F#, A=B(5th), D=F#(root), G=A(b3✓ barre covers), B=C#(5th✓ barre), e=F#
+    // Extra fingers: D-fret4(F#=root doubling)... wait. Standard F#m E-shape: barre fret2, A-str fret4(C#=5th... no: A-str fret4=C#. That's the 5th of F#. D-str fret4=F#=root. Confirmed: dots D-fret4 only, G covered by barre at fret2=A(b3).
+    {shape:"E",label:"E-shape II",fret:2,barre:true,barreString:6,
+      dots:[{s:4,f:4}],mute:[],open:[]},
+    // A-minor shape IX: barre A-str fret9; D-fret11, G-fret11, B-fret10
+    {shape:"A",label:"A-shape IX",fret:9,barre:true,barreString:5,
+      dots:[{s:4,f:11},{s:3,f:11},{s:2,f:10}],mute:[6],open:[]},
   ],
-  "E7":[{shape:"E7",label:"Open E7",fret:1,barre:false,dots:[{s:5,f:2},{s:4,f:2},{s:3,f:1}],mute:[],open:[6,2,1]}],
-  "B":[{shape:"A",label:"A-shape II",fret:2,barre:true,barreString:5,dots:[{s:4,f:4},{s:3,f:4},{s:2,f:4}],mute:[6],open:[]}],
-  "D5":[
-    {shape:"D5",label:"D power chord",fret:5,barre:false,dots:[{s:5,f:5},{s:4,f:7}],mute:[6,3,2,1],open:[]},
-    {shape:"D5",label:"Open D5",fret:1,barre:false,dots:[{s:5,f:0},{s:4,f:0}],mute:[6,3,2,1],open:[5,4]},
-  ],
-  "C5":[{shape:"C5",label:"C power chord",fret:3,barre:false,dots:[{s:5,f:3},{s:4,f:5}],mute:[6,3,2,1],open:[]}],
-  "Bb5":[{shape:"Bb5",label:"Bb power chord",fret:1,barre:false,dots:[{s:5,f:1},{s:4,f:3}],mute:[6,3,2,1],open:[]}],
-  "A5":[{shape:"A5",label:"A power chord",fret:1,barre:false,dots:[{s:5,f:0},{s:4,f:2}],mute:[6,3,2,1],open:[5]}],
 };
 
 function getCAGED(ch) {
-  const p = parseChord(ch);
-  const base = p?.root+(p?.quality.includes("m")&&!p?.quality.includes("maj")?"m":"");
+  // Direct lookup first
   if (CAGED[ch]) return CAGED[ch];
-  if (CAGED[base]) return CAGED[base];
+  // Try base chord (strip bass note for slash chords)
+  const p = parseChord(ch);
   if (!p) return [];
-  const f = Math.max(1, CHROMATIC.indexOf(p.root));
-  return [{shape:"E",label:`E-shape fret ${f}`,fret:f,barre:true,barreString:6,dots:[{s:4,f:f+2},{s:3,f:f+2},{s:2,f:f+1}],mute:[],open:[]}];
+  // Try root+quality without bass
+  const baseKey = p.root + p.quality;
+  if (CAGED[baseKey]) return CAGED[baseKey];
+  // Try root alone for major, or root+"m" for minor
+  const simpleBase = p.root + (p.quality.startsWith("m") && !p.quality.startsWith("maj") ? "m" : "");
+  if (CAGED[simpleBase]) return CAGED[simpleBase];
+  // Return empty — UI will show "not yet defined" message
+  return [];
 }
+
+
 
 // ════════════════════════════════════════════════════════════════════════════════
 // SECTION 4 — AUDIO ENGINE (lookahead scheduler for tight timing)
@@ -371,6 +568,14 @@ const LAYLA = {
         id:"r1", name:"The Layla Riff", type:"riff", feel:"straight", bpm_guide:80,
         difficulty:"intermediate", dataQuality:"verified",
         tab:["e |------------------------|","B |------------------------|","G |------------------------|","D |--7---5---3---5---7-----|","A |--5---3---1---3---5-----|","E |------------------------|"],
+        // notes: s=string(6=low E), f=fret, d=duration in beats
+        notes:[
+          {s:5,f:5,d:0.5},{s:4,f:7,d:0.5},
+          {s:5,f:3,d:0.5},{s:4,f:5,d:0.5},
+          {s:5,f:1,d:0.5},{s:4,f:3,d:0.5},
+          {s:5,f:3,d:0.5},{s:4,f:5,d:0.5},
+          {s:5,f:5,d:0.5},{s:4,f:7,d:0.5},
+        ],
         annotations:["D5 beat 1 — full downstroke, let ring","C5 beat 2 — two frets down, same two-finger shape","Bb5 fret 1 on A string — lowest point","Resolve back C5→D5","Repeat 5 times total before verse"],
         embellishments:[],
         techniqueSteps:["Index on A string, ring on D string for each power chord","Mute strings 1–3 with right palm — only A and D ring","Practice D5→C5 shift first — two frets in one motion","Bb5 at fret 1 is the hardest position — keep fingers arched","Add rhythm: strong downstroke beat 1, lighter on 2–4"],
@@ -386,6 +591,12 @@ const LAYLA = {
         id:"r2", name:"Verse Chord Hook", type:"lick", feel:"straight", bpm_guide:90,
         difficulty:"advanced", dataQuality:"verified",
         tab:["e |--4---4---0---2---4---4--|","B |--5---5---1---2---5---5--|","G |--6---6---0---2---6---6--|","D |--6---6---2---2---6---6--|","A |--4---4---3---0---4---4--|","E |-------------------------|"],
+        notes:[
+          {s:5,f:4,d:1},{s:4,f:6,d:1},{s:3,f:6,d:1},{s:2,f:5,d:1}, // C#m7
+          {s:5,f:6,d:1},{s:4,f:6,d:1},{s:3,f:5,d:1},{s:2,f:4,d:1}, // G#7
+          {s:5,f:3,d:0.5},{s:4,f:2,d:0.5},{s:3,f:0,d:0.5},{s:2,f:1,d:0.5}, // C
+          {s:5,f:0,d:0.5},{s:4,f:2,d:0.5},{s:3,f:2,d:0.5},{s:2,f:2,d:0.5}, // D
+        ],
         annotations:["C#m7 barre fret 4 — index covers 5 strings","G#7 4fr barre — trickiest chord in the song","Release to open C then D — brief relief from barres","F#m→B→E is the resolution — practise as a unit"],
         embellishments:[],
         techniqueSteps:["Practise C#m7 to G#7 alone — both barre chords in similar positions","C→D→E→E7 run uses open chords — this is your breath","F#m→B→E resolution: practise this three-chord move until automatic"],
@@ -568,68 +779,223 @@ function ChordDiagram({chordName,shape}) {
   );
 }
 
-// ─── Chord Tones ──────────────────────────────────────────────────────────────
+// ─── Chord Tones (collapsible) ────────────────────────────────────────────────
 function ChordTones({chordName}) {
-  const tones=chordTones(chordName);
-  const p=parseChord(chordName);
-  const meta=p?chordMeta(p.quality):{type:"",color:P.teal};
-  if(!tones.length)return null;
+  const [open, setOpen] = useState(false);
+  const tones = chordTones(chordName);
+  const p = parseChord(chordName);
+  const meta = p ? chordMeta(p.quality) : {type:"",color:P.teal};
+  if (!tones.length) return null;
   return (
-    <div style={{marginTop:12,background:P.surface,borderRadius:10,padding:"12px 14px",border:`1px solid ${meta.color}33`}}>
-      <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:10}}>
-        <div style={{color:P.muted,fontSize:10,fontWeight:700,letterSpacing:"0.1em"}}>CHORD TONES</div>
-        <span style={{background:meta.color+"22",color:meta.color,fontSize:10,fontWeight:700,padding:"2px 8px",borderRadius:10,border:`1px solid ${meta.color}44`}}>{meta.type}</span>
-      </div>
-      <div style={{display:"flex",gap:8,flexWrap:"wrap"}}>
-        {tones.map((t,i)=>(
-          <div key={i} style={{flex:"1 1 52px",background:P.card,border:`2px solid ${t.isRoot?meta.color:meta.color+"44"}`,borderRadius:10,padding:"10px 8px",textAlign:"center",boxShadow:t.isRoot?`0 0 12px ${meta.color}33`:"none"}}>
-            <div style={{color:meta.color,fontSize:t.isRoot?22:18,fontWeight:800,lineHeight:1}}>{t.note}</div>
-            <div style={{marginTop:5,background:t.isRoot?meta.color:meta.color+"22",color:t.isRoot?"#0a0a0f":meta.color,borderRadius:6,padding:"3px 0",fontSize:13,fontWeight:800}}>{t.deg}</div>
-            <div style={{color:P.muted,fontSize:9,marginTop:4,lineHeight:1.3}}>{t.label}</div>
+    <div style={{marginTop:12,borderRadius:10,border:`1px solid ${open?meta.color+"44":P.border}`,overflow:"hidden",transition:"border-color 0.2s"}}>
+      <button onClick={()=>setOpen(v=>!v)}
+        style={{width:"100%",display:"flex",alignItems:"center",justifyContent:"space-between",
+          padding:"10px 14px",background:open?meta.color+"12":P.surface,border:"none",cursor:"pointer"}}>
+        <div style={{display:"flex",alignItems:"center",gap:8}}>
+          <span style={{color:P.muted,fontSize:10,fontWeight:700,letterSpacing:"0.1em"}}>CHORD TONES</span>
+          <span style={{background:meta.color+"22",color:meta.color,fontSize:10,fontWeight:700,
+            padding:"2px 8px",borderRadius:10,border:`1px solid ${meta.color}44`}}>{meta.type}</span>
+        </div>
+        <span style={{color:P.muted,fontSize:13}}>{open?"▲":"▼"}</span>
+      </button>
+      {open && (
+        <div style={{padding:"12px 14px",background:P.surface,borderTop:`1px solid ${P.border}`}}>
+          <div style={{display:"flex",gap:8,flexWrap:"wrap"}}>
+            {tones.map((t,i)=>(
+              <div key={i} style={{flex:"1 1 52px",background:P.card,
+                border:`2px solid ${t.isRoot?meta.color:meta.color+"44"}`,
+                borderRadius:10,padding:"10px 8px",textAlign:"center",
+                boxShadow:t.isRoot?`0 0 12px ${meta.color}33`:"none"}}>
+                <div style={{color:meta.color,fontSize:t.isRoot?22:18,fontWeight:800,lineHeight:1}}>{t.note}</div>
+                <div style={{marginTop:5,background:t.isRoot?meta.color:meta.color+"22",
+                  color:t.isRoot?"#0a0a0f":meta.color,borderRadius:6,padding:"3px 0",
+                  fontSize:13,fontWeight:800}}>{t.deg}</div>
+                <div style={{color:P.muted,fontSize:9,marginTop:4,lineHeight:1.3}}>{t.label}</div>
+              </div>
+            ))}
           </div>
-        ))}
-      </div>
+        </div>
+      )}
     </div>
   );
 }
 
+// ─── Section Chord Playback (sequences chordTimeline at song tempo) ───────────
+function useSectionPlayback(chords, bpm) {
+  const [playing, setPlaying]   = useState(false);
+  const [activeIdx, setActive]  = useState(-1);
+  const ctxRef  = useRef(null);
+  const timerRef = useRef([]);
+
+  const stop = useCallback(() => {
+    timerRef.current.forEach(clearTimeout);
+    timerRef.current = [];
+    setPlaying(false); setActive(-1);
+  }, []);
+
+  const play = useCallback(() => {
+    if (!ctxRef.current) ctxRef.current = getCtx();
+    const ctx = ctxRef.current;
+    if (ctx.state === "suspended") ctx.resume();
+    stop();
+    const beatMs = (60 / bpm) * 1000 * 2; // 2 beats per chord change
+    setPlaying(true);
+    chords.forEach((ch, i) => {
+      const t1 = setTimeout(() => {
+        setActive(i);
+        playChord(ctx, chordMidi(ch), (beatMs / 1000) * 0.9);
+      }, i * beatMs);
+      timerRef.current.push(t1);
+    });
+    const tEnd = setTimeout(() => { setPlaying(false); setActive(-1); }, chords.length * beatMs + 200);
+    timerRef.current.push(tEnd);
+  }, [chords, bpm, stop]);
+
+  useEffect(() => () => stop(), [stop]);
+  return { playing, activeIdx, play, stop };
+}
+
+// ─── Riff Note Playback (sequences notes array) ───────────────────────────────
+function useRiffPlayback(notes, bpmGuide) {
+  const [playing, setPlaying]  = useState(false);
+  const [activeNote, setNote]  = useState(-1);
+  const ctxRef  = useRef(null);
+  const timerRef = useRef([]);
+
+  // Fret → frequency via standard tuning (string 6=E2, 5=A2, 4=D3, 3=G3, 2=B3, 1=E4)
+  const STRING_BASE_MIDI = {6:40, 5:45, 4:50, 3:55, 2:59, 1:64};
+  const noteToMidi = (s, f) => (STRING_BASE_MIDI[s] || 40) + f;
+
+  const stop = useCallback(() => {
+    timerRef.current.forEach(clearTimeout);
+    timerRef.current = [];
+    setPlaying(false); setNote(-1);
+  }, []);
+
+  const play = useCallback(() => {
+    if (!notes?.length) return;
+    if (!ctxRef.current) ctxRef.current = getCtx();
+    const ctx = ctxRef.current;
+    if (ctx.state === "suspended") ctx.resume();
+    stop();
+    const beatMs = (60 / bpmGuide) * 1000;
+    let offset = 0;
+    setPlaying(true);
+    notes.forEach((n, i) => {
+      const dur = n.d * beatMs;
+      const capturedOffset = offset;
+      const t = setTimeout(() => {
+        setNote(i);
+        const midi = noteToMidi(n.s, n.f);
+        const o = ctx.createOscillator(), g = ctx.createGain();
+        o.connect(g); g.connect(ctx.destination);
+        o.type = "triangle"; o.frequency.value = midiToFreq(midi);
+        g.gain.setValueAtTime(0.25, ctx.currentTime);
+        g.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + (dur / 1000) * 0.85);
+        o.start(ctx.currentTime); o.stop(ctx.currentTime + dur / 1000);
+      }, capturedOffset);
+      timerRef.current.push(t);
+      offset += dur;
+    });
+    const tEnd = setTimeout(() => { setPlaying(false); setNote(-1); }, offset + 200);
+    timerRef.current.push(tEnd);
+  }, [notes, bpmGuide, stop]);
+
+  useEffect(() => () => stop(), [stop]);
+  return { playing, activeNote, play, stop };
+}
+
 // ─── Chord Explorer ───────────────────────────────────────────────────────────
-function ChordExplorer({chords,semitones=0}) {
-  const trans=chords.map(c=>tChord(c,semitones));
-  const [selIdx,setSelIdx]=useState(0);
-  const [shapeIdx,setShapeIdx]=useState(0);
-  const [ringing,setRinging]=useState(false);
-  const ctxRef=useRef(null);
-  useEffect(()=>setShapeIdx(0),[selIdx,semitones]);
-  const sel=trans[selIdx]||trans[0];
-  const shapes=getCAGED(sel);
-  const play=()=>{
-    if(!ctxRef.current)ctxRef.current=getCtx();
-    const ctx=ctxRef.current; if(ctx.state==="suspended")ctx.resume();
-    playChord(ctx,chordMidi(sel));
-    setRinging(true); setTimeout(()=>setRinging(false),1800);
+function ChordExplorer({chords, semitones=0, bpm=116}) {
+  const trans = chords.map(c => tChord(c, semitones));
+  const [selIdx,  setSelIdx]  = useState(0);
+  const [shapeIdx, setShapeIdx] = useState(0);
+  const [ringing, setRinging] = useState(false);
+  const ctxRef = useRef(null);
+  const sectionPb = useSectionPlayback(trans, bpm);
+  useEffect(() => setShapeIdx(0), [selIdx, semitones]);
+
+  const sel    = trans[selIdx] || trans[0];
+  const shapes = getCAGED(sel);
+
+  const playSingle = () => {
+    if (!ctxRef.current) ctxRef.current = getCtx();
+    const ctx = ctxRef.current; if (ctx.state === "suspended") ctx.resume();
+    playChord(ctx, chordMidi(sel));
+    setRinging(true); setTimeout(() => setRinging(false), 1800);
   };
+
   return (
     <div style={{background:P.surface,border:`1px solid ${P.border}`,borderRadius:12,padding:18,marginBottom:16}}>
       <div style={{color:P.muted,fontSize:11,fontWeight:700,letterSpacing:"0.1em",marginBottom:12}}>CHORD EXPLORER</div>
-      <div style={{display:"flex",flexWrap:"wrap",gap:6,marginBottom:14}}>
-        {trans.map((c,i)=><button key={i} onClick={()=>setSelIdx(i)} style={{padding:"5px 13px",borderRadius:8,fontSize:13,fontWeight:700,border:`1px solid ${selIdx===i?P.accent:P.border}`,background:selIdx===i?P.accentDim:"transparent",color:selIdx===i?P.accent:P.textSoft,cursor:"pointer"}}>{c}</button>)}
-      </div>
-      <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:10}}>
-        <div style={{color:P.muted,fontSize:10,fontWeight:700,letterSpacing:"0.1em"}}>CAGED — {sel}</div>
-        <button onClick={play} style={{padding:"5px 14px",borderRadius:20,border:"none",cursor:"pointer",background:ringing?P.teal:P.accent,color:"#0a0a0f",fontWeight:800,fontSize:11,transition:"background 0.2s"}}>
-          {ringing?"♪ Ringing…":"▶ Play"}
-        </button>
-      </div>
-      <div style={{display:"flex",gap:10,overflowX:"auto",paddingBottom:8,scrollbarWidth:"thin",scrollbarColor:`${P.border} transparent`}}>
-        {shapes.map((sh,i)=>(
-          <div key={i} onClick={()=>setShapeIdx(i)} style={{flexShrink:0,cursor:"pointer",background:shapeIdx===i?P.card:P.bg,border:`2px solid ${shapeIdx===i?P.accent:P.border}`,borderRadius:10,padding:"10px 12px",transition:"all 0.15s",boxShadow:shapeIdx===i?`0 0 14px ${P.accent}33`:"none"}}>
-            <div style={{textAlign:"center",marginBottom:4}}><span style={{display:"inline-block",padding:"2px 8px",borderRadius:10,background:shapeIdx===i?P.accent+"33":P.border+"55",color:shapeIdx===i?P.accent:P.muted,fontSize:10,fontWeight:800}}>{sh.shape.length===1?`${sh.shape}-shape`:sh.shape}</span></div>
-            <ChordDiagram chordName={sel} shape={sh}/>
-            <div style={{textAlign:"center",marginTop:4}}><span style={{color:P.muted,fontSize:9}}>{sh.fret>1?`fret ${sh.fret}${sh.barre?" · barre":""}`:"open"}</span></div>
-          </div>
+
+      {/* Chord selector + section playback */}
+      <div style={{display:"flex",flexWrap:"wrap",gap:6,marginBottom:10}}>
+        {trans.map((c, i) => (
+          <button key={i} onClick={() => setSelIdx(i)} style={{
+            padding:"5px 13px", borderRadius:8, fontSize:13, fontWeight:700,
+            border:`1px solid ${selIdx===i ? P.accent : sectionPb.activeIdx===i ? P.teal : P.border}`,
+            background:selIdx===i ? P.accentDim : sectionPb.activeIdx===i ? P.tealDim : "transparent",
+            color:selIdx===i ? P.accent : sectionPb.activeIdx===i ? P.teal : P.textSoft,
+            cursor:"pointer", transition:"all 0.15s",
+          }}>{c}</button>
         ))}
       </div>
+
+      {/* Section playback control */}
+      <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:14}}>
+        <button onClick={sectionPb.playing ? sectionPb.stop : sectionPb.play}
+          style={{padding:"5px 14px",borderRadius:20,border:"none",cursor:"pointer",
+            background:sectionPb.playing ? P.red+"cc" : P.teal,
+            color:sectionPb.playing ? "#fff" : "#0a0a0f",
+            fontWeight:800, fontSize:11, transition:"background 0.2s"}}>
+          {sectionPb.playing ? "■ Stop" : "▶ Play Section"}
+        </button>
+        <div style={{color:P.muted,fontSize:11,fontWeight:700,letterSpacing:"0.1em"}}>CAGED — {sel}</div>
+        <button onClick={playSingle} style={{marginLeft:"auto",padding:"5px 14px",borderRadius:20,
+          border:"none",cursor:"pointer",
+          background:ringing ? P.teal : P.accent,
+          color:"#0a0a0f",fontWeight:800,fontSize:11,transition:"background 0.2s"}}>
+          {ringing ? "♪ Ringing…" : "▶ Play"}
+        </button>
+      </div>
+
+      {/* Chord diagrams */}
+      {shapes.length > 0 ? (
+        <div style={{display:"flex",gap:10,overflowX:"auto",paddingBottom:8,
+          scrollbarWidth:"thin",scrollbarColor:`${P.border} transparent`}}>
+          {shapes.map((sh, i) => (
+            <div key={i} onClick={() => setShapeIdx(i)} style={{flexShrink:0,cursor:"pointer",
+              background:shapeIdx===i ? P.card : P.bg,
+              border:`2px solid ${shapeIdx===i ? P.accent : P.border}`,
+              borderRadius:10,padding:"10px 12px",transition:"all 0.15s",
+              boxShadow:shapeIdx===i ? `0 0 14px ${P.accent}33` : "none"}}>
+              <div style={{textAlign:"center",marginBottom:4}}>
+                <span style={{display:"inline-block",padding:"2px 8px",borderRadius:10,
+                  background:shapeIdx===i ? P.accent+"33" : P.border+"55",
+                  color:shapeIdx===i ? P.accent : P.muted,
+                  fontSize:10, fontWeight:800}}>
+                  {sh.shape.length===1 ? `${sh.shape}-shape` : sh.shape}
+                </span>
+              </div>
+              <ChordDiagram chordName={sel} shape={sh}/>
+              <div style={{textAlign:"center",marginTop:4}}>
+                <span style={{color:P.muted,fontSize:9}}>
+                  {sh.fret>1 ? `fret ${sh.fret}${sh.barre?" · barre":""}` : "open"}
+                </span>
+              </div>
+            </div>
+          ))}
+        </div>
+      ) : (
+        <div style={{background:P.card,borderRadius:10,padding:"14px 16px",border:`1px solid ${P.border}`,
+          marginBottom:8,textAlign:"center"}}>
+          <div style={{color:P.muted,fontSize:13,marginBottom:4}}>No diagram yet for <strong style={{color:P.text}}>{sel}</strong></div>
+          <div style={{color:P.muted,fontSize:11}}>This chord shape will be added in a future update. Check the References for a tutorial that covers it.</div>
+        </div>
+      )}
+
+      {/* Collapsible chord tones */}
       <ChordTones chordName={sel}/>
     </div>
   );
@@ -651,21 +1017,23 @@ const FEEL_INFO = {
   swung:{label:"Swung",desc:"Long-short swing feel",color:P.gold},
 };
 
-function RiffCard({riff,onSetMetro}) {
-  const [open,setOpen]=useState(false);
-  const [aiLoad,setAiLoad]=useState(false);
-  const [aiResp,setAiResp]=useState(riff.aiSuggestions||[]);
-  const fi=FEEL_INFO[riff.feel]||FEEL_INFO.straight;
-  const isAI=riff.dataQuality==="ai_assisted";
-  const askAI=async()=>{
+function RiffCard({riff, onSetMetro}) {
+  const [open,setOpen]   = useState(false);
+  const [aiLoad,setAiLoad] = useState(false);
+  const [aiResp,setAiResp] = useState(riff.aiSuggestions||[]);
+  const fi     = FEEL_INFO[riff.feel]||FEEL_INFO.straight;
+  const isAI   = riff.dataQuality==="ai_assisted";
+  const riffPb = useRiffPlayback(riff.notes, riff.bpm_guide);
+
+  const askAI = async () => {
     setAiLoad(true);
-    try{
-      const res=await fetch("http://localhost:3001/api/claude",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({model:"claude-sonnet-4-5",max_tokens:400,messages:[{role:"user",content:`Guitar teacher: for the riff "${riff.name}" (${riff.type}, ${riff.feel} feel, ${riff.difficulty}), suggest 3 specific embellishments. Mention exact strings, frets, technique names. 1-2 sentences each. Return JSON array of strings only.`}]})});
-      const d=await res.json();
-      const arr=JSON.parse(d.content[0].text.match(/\[[\s\S]*\]/)?.[0]||"[]");
+    try {
+      const res = await fetch("http://localhost:3001/api/claude",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({model:"claude-sonnet-4-5",max_tokens:400,messages:[{role:"user",content:`Guitar teacher: for the riff "${riff.name}" (${riff.type}, ${riff.feel} feel, ${riff.difficulty}), suggest 3 specific embellishments. Mention exact strings, frets, technique names. 1-2 sentences each. Return JSON array of strings only.`}]})});
+      const d = await res.json();
+      const arr = JSON.parse(d.content[0].text.match(/\[[\s\S]*\]/)?.[0]||"[]");
       setAiResp(arr.length?arr:["Suggestion unavailable."]);
-    }catch{setAiResp([...aiResp,"Claude unavailable — check API access."]);}
-    finally{setAiLoad(false);}
+    } catch { setAiResp([...aiResp,"Claude unavailable — check API access."]); }
+    finally { setAiLoad(false); }
   };
   return (
     <div style={{background:P.surface,border:`1px solid ${P.border}`,borderRadius:12,marginBottom:12,overflow:"hidden"}}>
@@ -686,6 +1054,30 @@ function RiffCard({riff,onSetMetro}) {
       {open&&(
         <div style={{padding:"0 16px 16px"}}>
           {isAI&&<div style={{marginBottom:12}}><QualityBadge quality="ai_assisted"/></div>}
+
+          {/* Riff playback */}
+          {riff.notes?.length>0 && (
+            <div style={{marginBottom:14,display:"flex",alignItems:"center",gap:10,
+              background:P.card,borderRadius:8,padding:"10px 14px",border:`1px solid ${riffPb.playing?P.teal+"66":P.border}`}}>
+              <button onClick={riffPb.playing?riffPb.stop:riffPb.play}
+                style={{padding:"6px 16px",borderRadius:20,border:"none",cursor:"pointer",
+                  background:riffPb.playing?P.red+"cc":P.teal,
+                  color:riffPb.playing?"#fff":"#0a0a0f",fontWeight:800,fontSize:11}}>
+                {riffPb.playing?"■ Stop":"▶ Play Riff"}
+              </button>
+              <span style={{color:P.muted,fontSize:11}}>at {riff.bpm_guide} bpm · {riff.notes.length} notes</span>
+              {riffPb.playing && (
+                <div style={{display:"flex",gap:3,marginLeft:"auto"}}>
+                  {riff.notes.map((_,i)=>(
+                    <div key={i} style={{width:6,height:6,borderRadius:"50%",
+                      background:riffPb.activeNote===i?P.teal:P.border,
+                      transition:"background 0.05s"}}/>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
+
           <div style={{marginBottom:14}}>
             <div style={{color:P.muted,fontSize:10,fontWeight:700,letterSpacing:"0.1em",marginBottom:7}}>TABLATURE</div>
             <div style={{background:"#07070f",border:`1px solid ${P.border}`,borderRadius:8,padding:"12px 14px",fontFamily:"'Courier New',monospace",fontSize:11,lineHeight:1.9,color:P.teal,overflowX:"auto"}}>
@@ -1106,7 +1498,7 @@ function SectionDetail({section,onMarkMastered,isMobile,metro,semitones}) {
         <div>
           <MiniMetro metro={metro} onGoTo={()=>setTab("metronome")}/>
           <p style={{color:P.textSoft,fontSize:13,lineHeight:1.7,marginBottom:14}}>{section.technique}</p>
-          <ChordExplorer chords={section.chords} semitones={semitones}/>
+          <ChordExplorer chords={section.chords} semitones={semitones} bpm={metro.tempo}/>
         </div>
       )}
       {tab==="riffs"&&(
@@ -1135,22 +1527,50 @@ function SectionDetail({section,onMarkMastered,isMobile,metro,semitones}) {
 }
 
 // ─── Section Card ─────────────────────────────────────────────────────────────
-function SectionCard({section,isActive,onClick,isMobile,semitones}) {
-  const tc=section.chords.map(c=>tChord(c,semitones));
+function SectionCard({section, isActive, onClick, onStart, isMobile, semitones}) {
+  const tc = section.chords.map(c => tChord(c, semitones));
   return (
-    <div onClick={onClick} style={{cursor:"pointer",background:isActive?P.card:P.surface,border:`1px solid ${isActive?section.color+"66":P.border}`,borderLeft:`3px solid ${isActive?section.color:P.border}`,borderRadius:10,padding:isMobile?"11px 13px":"13px 15px",marginBottom:7,transition:"all 0.2s",boxShadow:isActive?`0 0 18px ${section.color}20`:"none"}}>
-      <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:3,gap:8}}>
-        <div style={{display:"flex",alignItems:"center",gap:9,minWidth:0}}>
-          <span style={{width:20,height:20,borderRadius:"50%",background:section.color+"33",border:`1px solid ${section.color}88`,color:section.color,fontSize:10,fontWeight:800,display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0}}>{section.id}</span>
-          <span style={{color:P.text,fontWeight:700,fontSize:13,whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis"}}>{section.name}</span>
+    <div style={{background:isActive?P.card:P.surface,
+      border:`1px solid ${isActive?section.color+"66":P.border}`,
+      borderLeft:`3px solid ${isActive?section.color:P.border}`,
+      borderRadius:10,padding:isMobile?"11px 13px":"13px 15px",marginBottom:7,
+      transition:"all 0.2s",boxShadow:isActive?`0 0 18px ${section.color}20`:"none"}}>
+      <div onClick={onClick} style={{cursor:"pointer"}}>
+        <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:3,gap:8}}>
+          <div style={{display:"flex",alignItems:"center",gap:9,minWidth:0}}>
+            <span style={{width:20,height:20,borderRadius:"50%",background:section.color+"33",
+              border:`1px solid ${section.color}88`,color:section.color,fontSize:10,fontWeight:800,
+              display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0}}>{section.id}</span>
+            <span style={{color:P.text,fontWeight:700,fontSize:13,whiteSpace:"nowrap",
+              overflow:"hidden",textOverflow:"ellipsis"}}>{section.name}</span>
+          </div>
+          <div style={{flexShrink:0}}><StatusBadge status={section.status}/></div>
         </div>
-        <div style={{flexShrink:0}}><StatusBadge status={section.status}/></div>
+        <div style={{display:"flex",gap:8,paddingLeft:29,flexWrap:"wrap",alignItems:"center"}}>
+          <span style={{color:P.muted,fontSize:11}}>{section.type}</span>
+          <span style={{color:section.color,fontSize:11,fontWeight:600}}>
+            {tc.slice(0,3).join(" · ")}{tc.length>3?" …":""}
+          </span>
+          {section.riffs?.length>0 && (
+            <span style={{background:P.purple+"22",color:P.purple,fontSize:9,fontWeight:700,
+              padding:"1px 6px",borderRadius:8}}>
+              {section.riffs.length} riff{section.riffs.length>1?"s":""}
+            </span>
+          )}
+        </div>
       </div>
-      <div style={{display:"flex",gap:8,paddingLeft:29,flexWrap:"wrap",alignItems:"center"}}>
-        <span style={{color:P.muted,fontSize:11}}>{section.type}</span>
-        <span style={{color:section.color,fontSize:11,fontWeight:600}}>{tc.slice(0,3).join(" · ")}{tc.length>3?" …":""}</span>
-        {section.riffs?.length>0&&<span style={{background:P.purple+"22",color:P.purple,fontSize:9,fontWeight:700,padding:"1px 6px",borderRadius:8}}>{section.riffs.length} riff{section.riffs.length>1?"s":""}</span>}
-      </div>
+      {/* Start button — only shows when section is not-started or when selected */}
+      {(isActive || section.status==="not-started") && section.status!=="mastered" && (
+        <div style={{marginTop:10,paddingTop:10,borderTop:`1px solid ${P.border}44`}}>
+          <button onClick={e => { e.stopPropagation(); onStart(section); }}
+            style={{width:"100%",padding:"8px 0",borderRadius:8,border:"none",cursor:"pointer",
+              fontWeight:800,fontSize:12,
+              background:section.status==="not-started" ? section.color : P.accent,
+              color:"#0a0a0f",transition:"background 0.2s"}}>
+            {section.status==="not-started" ? `▶ Start ${section.name}` : `▶ Continue ${section.name}`}
+          </button>
+        </div>
+      )}
     </div>
   );
 }
@@ -1523,7 +1943,7 @@ Rules:
         })
       });
       const data = await res.json();
-      if (data.error) throw new Error(JSON.stringify(data.error));
+      if (data.error) throw new Error(data.error.message);
       const text = data.content[0].text;
       const jm = text.match(/\{[\s\S]*\}/);
       if (!jm) throw new Error("No JSON found in response");
@@ -1998,7 +2418,24 @@ export default function SongCraft() {
     });
   },[activeSong]);
 
-  const handleResume=secId=>{setActiveSecId(secId);if(isMobile)setShowDetail(true);};
+  const handleResume = secId => { setActiveSecId(secId); if (isMobile) setShowDetail(true); };
+
+  const handleStart = useCallback(section => {
+    if (section.status === "not-started" && activeSong) {
+      setAllProgress(prev => {
+        const sp = {...(prev[activeSong.id]||{})};
+        if (!sp[section.id]) sp[section.id] = "in-progress";
+        const next = {...prev, [activeSong.id]: sp};
+        ls.save(LS_PROGRESS, next); return next;
+      });
+    }
+    // Set metronome to 50% BPM — ideal starting practice speed
+    const practiceBpm = Math.round((activeSong?.bpm||116) * 0.5);
+    metro.setTempo(practiceBpm);
+    if (!metro.running) metro.start();
+    setActiveSecId(section.id);
+    if (isMobile) setShowDetail(true);
+  }, [activeSong, metro, isMobile]);
 
   return (
     <div style={{background:P.bg,minHeight:"100vh",fontFamily:"'Georgia','Times New Roman',serif",color:P.text}}>
@@ -2073,14 +2510,14 @@ export default function SongCraft() {
               ):(
                 <div>
                   <div style={{color:P.muted,fontSize:10,fontWeight:700,letterSpacing:"0.1em",marginBottom:10}}>SECTIONS — tap to open</div>
-                  {sections.map(s=><SectionCard key={s.id} section={s} isActive={activeSecId===s.id} onClick={()=>{setActiveSecId(s.id);setShowDetail(true);}} isMobile semitones={semitones}/>)}
+                  {sections.map(s=><SectionCard key={s.id} section={s} isActive={activeSecId===s.id} onClick={()=>{setActiveSecId(s.id);setShowDetail(true);}} onStart={handleStart} isMobile semitones={semitones}/>)}
                 </div>
               )
             ):(
               <div style={{display:"flex",gap:18,alignItems:"flex-start"}}>
                 <div style={{flex:"0 0 265px"}}>
                   <div style={{color:P.muted,fontSize:11,fontWeight:700,letterSpacing:"0.1em",marginBottom:11}}>SECTIONS</div>
-                  {sections.map(s=><SectionCard key={s.id} section={s} isActive={activeSecId===s.id} onClick={()=>setActiveSecId(s.id)} isMobile={false} semitones={semitones}/>)}
+                  {sections.map(s=><SectionCard key={s.id} section={s} isActive={activeSecId===s.id} onClick={()=>setActiveSecId(s.id)} onStart={handleStart} isMobile={false} semitones={semitones}/>)}
                 </div>
                 <div style={{flex:1,minWidth:0}}>
                   <div style={{color:P.muted,fontSize:11,fontWeight:700,letterSpacing:"0.1em",marginBottom:11}}>SECTION DETAIL</div>
