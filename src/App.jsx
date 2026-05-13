@@ -151,7 +151,8 @@ const CAGED = {
       dots:[{s:4,f:7},{s:3,f:6},{s:2,f:6}],mute:[],open:[]},
   ],
   E:[
-    // Open E: low E-open, A-fret2(B), D-fret2(E), G-fret1(G#), B-open, e-open
+    // Open E: low E-open, A-fret2(B), D-fret2(E), G-fret1(G#=maj3rd), B-open, e-open
+    // Verified: FaChords Major Chords diagram (1) — 3 fingers: A-fret2, D-fret2, G-fret1
     {shape:"E",label:"Open E",fret:1,barre:false,
       dots:[{s:5,f:2},{s:4,f:2},{s:3,f:1}],mute:[],open:[6,2,1]},
     // C-shape IV — barre all 6 fret4; A-fret6(C#... wait E is root at low-E fret4? No.
@@ -270,10 +271,13 @@ const CAGED = {
       dots:[{s:3,f:2},{s:2,f:1},{s:1,f:1}],mute:[6,5],open:[4]},
   ],
   "C#m7":[
-    // A-minor7 shape at fret4: barre A-str fret4(C#); D-fret6(G#=5th), G-fret6(C#=root oct), B-fret5(E=b3)
+    // Am7-shape IV: barre A-str fret4(C#=root); cluster D-fret6(G#=5th), G-fret6(C#=root oct), B-fret5(E=b3)
+    // Barre also covers e-string fret4 = B (b7 ✓) — all four tones present: C#(1) E(b3) G#(5) B(b7)
+    // Verified: FaChords Minor 7th moveable shapes (Am7 shape moved to fret 4)
     {shape:"A",label:"A-shape IV",fret:4,barre:true,barreString:5,
       dots:[{s:4,f:6},{s:3,f:6},{s:2,f:5}],mute:[6],open:[]},
-    // E-minor7 shape IX: barre all fret9; A-fret11, D-fret11
+    // E-minor7 shape IX: barre all fret9; A-fret11(C#=root), D-fret11(G#=5th)
+    // Barre covers G=C#(root), B=E(b3), e=C#(root); A-fret11=C#, D-fret11=G#(5th) — B(b7) at barre fret9 ✓
     {shape:"E",label:"E-shape IX",fret:9,barre:true,barreString:6,
       dots:[{s:5,f:11},{s:4,f:11}],mute:[],open:[]},
   ],
@@ -352,11 +356,13 @@ const CAGED = {
       dots:[{s:4,f:2}],mute:[6,3,2,1],open:[5]},
   ],
   "F#m":[
-    // E-minor shape II: barre all 6 fret2; A-fret4(F#=root confirmed by D-string), D-fret4
-    // F#m: F#(1) A(b3) C#(5). Barre fret2: E=F#, A=B(5th), D=F#(root), G=A(b3✓ barre covers), B=C#(5th✓ barre), e=F#
-    // Extra fingers: D-fret4(F#=root doubling)... wait. Standard F#m E-shape: barre fret2, A-str fret4(C#=5th... no: A-str fret4=C#. That's the 5th of F#. D-str fret4=F#=root. Confirmed: dots D-fret4 only, G covered by barre at fret2=A(b3).
+    // E-minor shape II: barre all 6 fret2
+    // F#m tones: F#(1) A(b3) C#(5)
+    // Barre fret2 covers E=F#(root), B=C#(5th), e=F#(root)
+    // Extra fingers: A-fret4(C#=5th), D-fret4(F#=root), G-fret4(A=b3)
+    // Verified: GuitarHabits barre chords (A-minor shape) diagram — standard 3-finger cluster
     {shape:"E",label:"E-shape II",fret:2,barre:true,barreString:6,
-      dots:[{s:4,f:4}],mute:[],open:[]},
+      dots:[{s:5,f:4},{s:4,f:4},{s:3,f:4}],mute:[],open:[]},
     // A-minor shape IX: barre A-str fret9; D-fret11, G-fret11, B-fret10
     {shape:"A",label:"A-shape IX",fret:9,barre:true,barreString:5,
       dots:[{s:4,f:11},{s:3,f:11},{s:2,f:10}],mute:[6],open:[]},
@@ -512,11 +518,22 @@ function scorePitch(det,ref) {
 const V_CHORDS = ["C#m7","G#7","C#m7","C","D","E","E7","F#m","B","E","A","F#m","B","E"];
 const C_CHORDS = ["A","D5","C5","Bb5","C5","D5","C5","Bb5","C5","D5","C5","Bb5","C5","A5","C5"];
 
+// Layla verse chord grouping: chords per lyric line
+// Line 1: C#m7 G#7 (2) — "What will you do when you get lonely?"
+// Line 2: C#m7 C D (3) — "No one waiting by your side."
+// Line 3: E E7 F#m B E (5) — "You've been runnin' hidin' much too long."
+// Line 4: A F#m B E (4) — "You know it's just your foolish pride."
+const V_LINE_GROUPS = [2, 3, 5, 4];
+
 function vLyrics(lines, chords) {
   return {
     tip:"Attack each line with conviction — Clapton's delivery is urgent, not pleading.",
     chordTimeline: chords.slice(0,8).map((chord,i)=>({chord,t:i*2.2})),
-    lines,
+    lineGroups: V_LINE_GROUPS,
+    lines: lines.map((line, i) => ({
+      ...line,
+      chordCount: V_LINE_GROUPS[i] || 0,
+    })),
   };
 }
 
@@ -820,39 +837,80 @@ function ChordTones({chordName}) {
   );
 }
 
-// ─── Section Chord Playback (sequences chordTimeline at song tempo) ───────────
-function useSectionPlayback(chords, bpm) {
-  const [playing, setPlaying]   = useState(false);
+// ─── Section Chord Playback with Count-In + Loop ─────────────────────────────
+// Count-in clicks are scheduled on the audio clock (immune to JS jitter).
+// Visual countdown uses setTimeout offset from the same audio reference time.
+// Loop uses a ref (not state) so the setTimeout closure always sees the latest value.
+function useCountInPlayback(chords, bpm, bpb=4) {
+  const [playing,  setPlaying]  = useState(false);
   const [activeIdx, setActive]  = useState(-1);
-  const ctxRef  = useRef(null);
+  const [countIn,  setCountIn]  = useState(null); // null | 4 | 3 | 2 | 1
+  const [loop,     setLoopState] = useState(false);
+  const ctxRef   = useRef(null);
   const timerRef = useRef([]);
+  const loopRef  = useRef(false);
+  const playRef  = useRef(null); // stable ref to play fn for loop self-call
+
+  const setLoop = (v) => { loopRef.current = v; setLoopState(v); };
 
   const stop = useCallback(() => {
     timerRef.current.forEach(clearTimeout);
     timerRef.current = [];
-    setPlaying(false); setActive(-1);
+    setPlaying(false); setActive(-1); setCountIn(null);
   }, []);
 
   const play = useCallback(() => {
     if (!ctxRef.current) ctxRef.current = getCtx();
     const ctx = ctxRef.current;
     if (ctx.state === "suspended") ctx.resume();
-    stop();
-    const beatMs = (60 / bpm) * 1000 * 2; // 2 beats per chord change
-    setPlaying(true);
-    chords.forEach((ch, i) => {
-      const t1 = setTimeout(() => {
-        setActive(i);
-        playChord(ctx, chordMidi(ch), (beatMs / 1000) * 0.9);
-      }, i * beatMs);
-      timerRef.current.push(t1);
-    });
-    const tEnd = setTimeout(() => { setPlaying(false); setActive(-1); }, chords.length * beatMs + 200);
-    timerRef.current.push(tEnd);
-  }, [chords, bpm, stop]);
+    timerRef.current.forEach(clearTimeout);
+    timerRef.current = [];
+    setActive(-1); setCountIn(null);
 
+    const beatSec   = 60 / bpm;
+    const beatMs    = beatSec * 1000;
+    const chordMs   = beatMs * 2;
+    const countInMs = bpb * beatMs;
+    const audioNow  = ctx.currentTime;
+
+    // Schedule count-in clicks on audio clock
+    for (let i = 0; i < bpb; i++) {
+      scheduleClick(ctx, audioNow + i * beatSec, i === 0);
+    }
+
+    // Visual countdown — mirrors audio schedule via setTimeout
+    setPlaying(true);
+    for (let i = 0; i < bpb; i++) {
+      const t = setTimeout(() => setCountIn(bpb - i), i * beatMs);
+      timerRef.current.push(t);
+    }
+    timerRef.current.push(setTimeout(() => setCountIn(null), countInMs));
+
+    // Chord sequence starts after count-in
+    chords.forEach((ch, i) => {
+      const t = setTimeout(() => {
+        setActive(i);
+        playChord(ctx, chordMidi(ch), (chordMs / 1000) * 0.9);
+      }, countInMs + i * chordMs);
+      timerRef.current.push(t);
+    });
+
+    // End / loop
+    const tEnd = setTimeout(() => {
+      setActive(-1);
+      if (loopRef.current) {
+        playRef.current && playRef.current();
+      } else {
+        setPlaying(false);
+      }
+    }, countInMs + chords.length * chordMs + 200);
+    timerRef.current.push(tEnd);
+  }, [chords, bpm, bpb]);
+
+  // Keep playRef current so loop self-call always uses latest play
+  useEffect(() => { playRef.current = play; }, [play]);
   useEffect(() => () => stop(), [stop]);
-  return { playing, activeIdx, play, stop };
+  return { playing, countIn, activeIdx, loop, setLoop, play, stop };
 }
 
 // ─── Riff Note Playback (sequences notes array) ───────────────────────────────
@@ -906,97 +964,249 @@ function useRiffPlayback(notes, bpmGuide) {
 }
 
 // ─── Chord Explorer ───────────────────────────────────────────────────────────
-function ChordExplorer({chords, semitones=0, bpm=116}) {
+// lineGroups: optional array of group sizes matching lyric lines, e.g. [2,3,5,4]
+function ChordExplorer({chords, semitones=0, bpm=116, lineGroups=null}) {
   const trans = chords.map(c => tChord(c, semitones));
-  const [selIdx,  setSelIdx]  = useState(0);
-  const [shapeIdx, setShapeIdx] = useState(0);
-  const [ringing, setRinging] = useState(false);
+  const [selIdx,    setSelIdx]    = useState(0);
+  const [shapeIdx,  setShapeIdx]  = useState(0);
+  const [ringing,   setRinging]   = useState(false);
+  const [cagedOpen, setCagedOpen] = useState(false);
   const ctxRef = useRef(null);
-  const sectionPb = useSectionPlayback(trans, bpm);
+
+  // Use bpb=4 (4/4 time) for count-in — matches Layla's time signature
+  const pb = useCountInPlayback(trans, bpm, 4);
   useEffect(() => setShapeIdx(0), [selIdx, semitones]);
 
-  const sel    = trans[selIdx] || trans[0];
-  const shapes = getCAGED(sel);
+  // During playback use activeIdx for display, else selIdx
+  const displayIdx = pb.playing && pb.activeIdx >= 0 ? pb.activeIdx : selIdx;
+  const nextIdx    = pb.loop
+    ? (displayIdx + 1) % trans.length
+    : Math.min(displayIdx + 1, trans.length - 1);
+
+  const nowChord  = trans[displayIdx] || trans[0];
+  const nextChord = trans[nextIdx];
+  const nowShapes  = getCAGED(nowChord);
+  const nextShapes = getCAGED(nextChord);
+  const nowShape   = nowShapes[shapeIdx] || nowShapes[0];
+  const nextShape  = nextShapes[0];
 
   const playSingle = () => {
     if (!ctxRef.current) ctxRef.current = getCtx();
     const ctx = ctxRef.current; if (ctx.state === "suspended") ctx.resume();
-    playChord(ctx, chordMidi(sel));
+    playChord(ctx, chordMidi(nowChord));
     setRinging(true); setTimeout(() => setRinging(false), 1800);
   };
+
+  // Chord button label during count-in or playing
+  const playBtnLabel = () => {
+    if (pb.countIn !== null) return `${pb.countIn}…`;
+    if (pb.playing) return "■ Stop";
+    return "▶ Play Section";
+  };
+  const playBtnBg = pb.playing
+    ? (pb.countIn !== null ? P.accent : P.red+"cc")
+    : P.teal;
+  const playBtnColor = pb.playing && pb.countIn === null ? "#fff" : "#0a0a0f";
+
+  // Build grouped chord rows when lineGroups provided
+  const buildGroups = () => {
+    if (!lineGroups || lineGroups.length === 0) return null;
+    const groups = [];
+    let cursor = 0;
+    lineGroups.forEach((size, gi) => {
+      groups.push({ lineNum: gi+1, chords: trans.slice(cursor, cursor+size), startIdx: cursor });
+      cursor += size;
+    });
+    if (cursor < trans.length) {
+      groups.push({ lineNum: groups.length+1, chords: trans.slice(cursor), startIdx: cursor });
+    }
+    return groups;
+  };
+  const groups = buildGroups();
+
+  const ChordBtn = ({ c, globalIdx }) => (
+    <button onClick={() => { setSelIdx(globalIdx); pb.stop(); }} style={{
+      padding:"5px 13px", borderRadius:8, fontSize:13, fontWeight:700,
+      border:`1px solid ${selIdx===globalIdx ? P.accent : pb.activeIdx===globalIdx ? P.teal : P.border}`,
+      background:selIdx===globalIdx ? P.accentDim : pb.activeIdx===globalIdx ? P.tealDim : "transparent",
+      color:selIdx===globalIdx ? P.accent : pb.activeIdx===globalIdx ? P.teal : P.textSoft,
+      cursor:"pointer", transition:"all 0.15s",
+    }}>{c}</button>
+  );
 
   return (
     <div style={{background:P.surface,border:`1px solid ${P.border}`,borderRadius:12,padding:18,marginBottom:16}}>
       <div style={{color:P.muted,fontSize:11,fontWeight:700,letterSpacing:"0.1em",marginBottom:12}}>CHORD EXPLORER</div>
 
-      {/* Chord selector + section playback */}
-      <div style={{display:"flex",flexWrap:"wrap",gap:6,marginBottom:10}}>
-        {trans.map((c, i) => (
-          <button key={i} onClick={() => setSelIdx(i)} style={{
-            padding:"5px 13px", borderRadius:8, fontSize:13, fontWeight:700,
-            border:`1px solid ${selIdx===i ? P.accent : sectionPb.activeIdx===i ? P.teal : P.border}`,
-            background:selIdx===i ? P.accentDim : sectionPb.activeIdx===i ? P.tealDim : "transparent",
-            color:selIdx===i ? P.accent : sectionPb.activeIdx===i ? P.teal : P.textSoft,
-            cursor:"pointer", transition:"all 0.15s",
-          }}>{c}</button>
-        ))}
-      </div>
-
-      {/* Section playback control */}
-      <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:14}}>
-        <button onClick={sectionPb.playing ? sectionPb.stop : sectionPb.play}
-          style={{padding:"5px 14px",borderRadius:20,border:"none",cursor:"pointer",
-            background:sectionPb.playing ? P.red+"cc" : P.teal,
-            color:sectionPb.playing ? "#fff" : "#0a0a0f",
-            fontWeight:800, fontSize:11, transition:"background 0.2s"}}>
-          {sectionPb.playing ? "■ Stop" : "▶ Play Section"}
-        </button>
-        <div style={{color:P.muted,fontSize:11,fontWeight:700,letterSpacing:"0.1em"}}>CAGED — {sel}</div>
-        <button onClick={playSingle} style={{marginLeft:"auto",padding:"5px 14px",borderRadius:20,
-          border:"none",cursor:"pointer",
-          background:ringing ? P.teal : P.accent,
-          color:"#0a0a0f",fontWeight:800,fontSize:11,transition:"background 0.2s"}}>
-          {ringing ? "♪ Ringing…" : "▶ Play"}
-        </button>
-      </div>
-
-      {/* Chord diagrams */}
-      {shapes.length > 0 ? (
-        <div style={{display:"flex",gap:10,overflowX:"auto",paddingBottom:8,
-          scrollbarWidth:"thin",scrollbarColor:`${P.border} transparent`}}>
-          {shapes.map((sh, i) => (
-            <div key={i} onClick={() => setShapeIdx(i)} style={{flexShrink:0,cursor:"pointer",
-              background:shapeIdx===i ? P.card : P.bg,
-              border:`2px solid ${shapeIdx===i ? P.accent : P.border}`,
-              borderRadius:10,padding:"10px 12px",transition:"all 0.15s",
-              boxShadow:shapeIdx===i ? `0 0 14px ${P.accent}33` : "none"}}>
-              <div style={{textAlign:"center",marginBottom:4}}>
-                <span style={{display:"inline-block",padding:"2px 8px",borderRadius:10,
-                  background:shapeIdx===i ? P.accent+"33" : P.border+"55",
-                  color:shapeIdx===i ? P.accent : P.muted,
-                  fontSize:10, fontWeight:800}}>
-                  {sh.shape.length===1 ? `${sh.shape}-shape` : sh.shape}
-                </span>
+      {/* Chord selector — grouped by lyric line or flat */}
+      {groups ? (
+        <div style={{marginBottom:10}}>
+          {groups.map((grp, gi) => (
+            <div key={gi}>
+              <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:5,marginTop:gi>0?8:0}}>
+                <span style={{color:P.muted,fontSize:9,fontWeight:700,letterSpacing:"0.12em",whiteSpace:"nowrap"}}>LINE {grp.lineNum}</span>
+                <div style={{flex:1,height:1,background:P.border}}/>
               </div>
-              <ChordDiagram chordName={sel} shape={sh}/>
-              <div style={{textAlign:"center",marginTop:4}}>
-                <span style={{color:P.muted,fontSize:9}}>
-                  {sh.fret>1 ? `fret ${sh.fret}${sh.barre?" · barre":""}` : "open"}
-                </span>
+              <div style={{display:"flex",flexWrap:"wrap",gap:6}}>
+                {grp.chords.map((c,ci) => <ChordBtn key={ci} c={c} globalIdx={grp.startIdx+ci}/>)}
               </div>
             </div>
           ))}
         </div>
       ) : (
-        <div style={{background:P.card,borderRadius:10,padding:"14px 16px",border:`1px solid ${P.border}`,
-          marginBottom:8,textAlign:"center"}}>
-          <div style={{color:P.muted,fontSize:13,marginBottom:4}}>No diagram yet for <strong style={{color:P.text}}>{sel}</strong></div>
-          <div style={{color:P.muted,fontSize:11}}>This chord shape will be added in a future update. Check the References for a tutorial that covers it.</div>
+        <div style={{display:"flex",flexWrap:"wrap",gap:6,marginBottom:10}}>
+          {trans.map((c,i) => <ChordBtn key={i} c={c} globalIdx={i}/>)}
         </div>
       )}
 
+      {/* Playback controls row */}
+      <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:14,flexWrap:"wrap"}}>
+        {/* Play / Stop / Count-in button */}
+        <button
+          onClick={pb.playing ? pb.stop : pb.play}
+          style={{padding:"5px 16px",borderRadius:20,border:"none",cursor:"pointer",
+            background:playBtnBg,color:playBtnColor,
+            fontWeight:800,fontSize:pb.countIn!==null?16:11,
+            minWidth:110,transition:"background 0.15s, font-size 0.1s"}}>
+          {playBtnLabel()}
+        </button>
+
+        {/* Loop toggle */}
+        <button
+          onClick={() => pb.setLoop(!pb.loop)}
+          title={pb.loop ? "Loop on — click to turn off" : "Loop off — click to turn on"}
+          style={{padding:"5px 12px",borderRadius:20,cursor:"pointer",fontWeight:800,fontSize:11,
+            border:`1px solid ${pb.loop ? P.purple : P.border}`,
+            background:pb.loop ? P.purple+"33" : "transparent",
+            color:pb.loop ? P.purple : P.muted,transition:"all 0.15s"}}>
+          🔁 {pb.loop ? "Loop On" : "Loop"}
+        </button>
+
+        {/* Single chord play */}
+        <button onClick={playSingle} style={{marginLeft:"auto",padding:"5px 14px",borderRadius:20,
+          border:"none",cursor:"pointer",
+          background:ringing ? P.teal : P.accentDim,
+          color:ringing ? "#0a0a0f" : P.accent,
+          border:`1px solid ${P.accent}55`,
+          fontWeight:800,fontSize:11,transition:"background 0.2s"}}>
+          {ringing ? "♪ Ringing…" : "▶ Play Chord"}
+        </button>
+      </div>
+
+      {/* ── NOW / NEXT 2-panel diagram ── */}
+      <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:10,marginBottom:14}}>
+
+        {/* NOW PLAYING panel */}
+        <div style={{
+          background:P.card,borderRadius:10,padding:"10px 12px",
+          border:`2px solid ${P.accent}`,
+          boxShadow:`0 0 14px ${P.accent}22`,
+        }}>
+          <div style={{display:"flex",alignItems:"center",gap:6,marginBottom:8}}>
+            <span style={{fontSize:8,fontWeight:800,letterSpacing:"0.12em",color:P.accent}}>▶ NOW</span>
+            <span style={{color:P.accent,fontSize:14,fontWeight:900,lineHeight:1}}>{nowChord}</span>
+          </div>
+          {nowShape ? (
+            <>
+              <div style={{display:"flex",justifyContent:"center"}}>
+                <ChordDiagram chordName={nowChord} shape={nowShape}/>
+              </div>
+              <div style={{textAlign:"center",marginTop:4}}>
+                <span style={{color:P.muted,fontSize:9}}>
+                  {nowShape.label} {nowShape.fret>1?`· fret ${nowShape.fret}`:"· open"}
+                </span>
+              </div>
+            </>
+          ) : (
+            <div style={{color:P.muted,fontSize:11,textAlign:"center",padding:"12px 0"}}>No diagram</div>
+          )}
+        </div>
+
+        {/* UP NEXT panel */}
+        <div style={{
+          background:P.surface,borderRadius:10,padding:"10px 12px",
+          border:`1px solid ${P.border}`,
+          opacity: displayIdx === nextIdx ? 0.4 : 0.75,
+          transition:"opacity 0.2s",
+        }}>
+          <div style={{display:"flex",alignItems:"center",gap:6,marginBottom:8}}>
+            <span style={{fontSize:8,fontWeight:800,letterSpacing:"0.12em",color:P.muted}}>⟶ NEXT</span>
+            <span style={{color:P.textSoft,fontSize:14,fontWeight:900,lineHeight:1}}>{nextChord}</span>
+          </div>
+          {nextShape ? (
+            <>
+              <div style={{display:"flex",justifyContent:"center"}}>
+                <ChordDiagram chordName={nextChord} shape={nextShape}/>
+              </div>
+              <div style={{textAlign:"center",marginTop:4}}>
+                <span style={{color:P.muted,fontSize:9}}>
+                  {nextShape.label} {nextShape.fret>1?`· fret ${nextShape.fret}`:"· open"}
+                </span>
+              </div>
+            </>
+          ) : (
+            <div style={{color:P.muted,fontSize:11,textAlign:"center",padding:"12px 0"}}>No diagram</div>
+          )}
+        </div>
+      </div>
+
+      {/* ── Collapsible CAGED shape carousel ── */}
+      <div style={{borderRadius:10,border:`1px solid ${cagedOpen?P.accent+"44":P.border}`,overflow:"hidden",marginBottom:2,transition:"border-color 0.2s"}}>
+        <button
+          onClick={() => setCagedOpen(v => !v)}
+          style={{width:"100%",display:"flex",alignItems:"center",justifyContent:"space-between",
+            padding:"10px 14px",background:cagedOpen?P.accent+"10":P.surface,border:"none",cursor:"pointer"}}>
+          <div style={{display:"flex",alignItems:"center",gap:8}}>
+            <span style={{color:P.muted,fontSize:10,fontWeight:700,letterSpacing:"0.1em"}}>CAGED SHAPES</span>
+            <span style={{color:P.accent,fontSize:13,fontWeight:800}}>{nowChord}</span>
+            {nowShapes.length>0 && (
+              <span style={{background:P.accent+"22",color:P.accent,fontSize:9,fontWeight:800,
+                padding:"1px 6px",borderRadius:8,border:`1px solid ${P.accent}44`}}>
+                {nowShapes.length} shape{nowShapes.length>1?"s":""}
+              </span>
+            )}
+          </div>
+          <span style={{color:P.muted,fontSize:13}}>{cagedOpen?"▲":"▼"}</span>
+        </button>
+        {cagedOpen && (
+          <div style={{padding:"12px 14px",background:P.surface,borderTop:`1px solid ${P.border}`}}>
+            {nowShapes.length > 0 ? (
+              <div style={{display:"flex",gap:10,overflowX:"auto",paddingBottom:8,
+                scrollbarWidth:"thin",scrollbarColor:`${P.border} transparent`}}>
+                {nowShapes.map((sh,i) => (
+                  <div key={i} onClick={() => setShapeIdx(i)} style={{flexShrink:0,cursor:"pointer",
+                    background:shapeIdx===i ? P.card : P.bg,
+                    border:`2px solid ${shapeIdx===i ? P.accent : P.border}`,
+                    borderRadius:10,padding:"10px 12px",transition:"all 0.15s",
+                    boxShadow:shapeIdx===i?`0 0 14px ${P.accent}33`:"none"}}>
+                    <div style={{textAlign:"center",marginBottom:4}}>
+                      <span style={{display:"inline-block",padding:"2px 8px",borderRadius:10,
+                        background:shapeIdx===i?P.accent+"33":P.border+"55",
+                        color:shapeIdx===i?P.accent:P.muted,fontSize:10,fontWeight:800}}>
+                        {sh.shape.length===1?`${sh.shape}-shape`:sh.shape}
+                      </span>
+                    </div>
+                    <ChordDiagram chordName={nowChord} shape={sh}/>
+                    <div style={{textAlign:"center",marginTop:4}}>
+                      <span style={{color:P.muted,fontSize:9}}>
+                        {sh.fret>1?`fret ${sh.fret}${sh.barre?" · barre":""}` : "open"}
+                      </span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div style={{background:P.card,borderRadius:10,padding:"14px 16px",border:`1px solid ${P.border}`,textAlign:"center"}}>
+                <div style={{color:P.muted,fontSize:13,marginBottom:4}}>No diagram yet for <strong style={{color:P.text}}>{nowChord}</strong></div>
+                <div style={{color:P.muted,fontSize:11}}>This chord shape will be added in a future update.</div>
+              </div>
+            )}
+          </div>
+        )}
+      </div>
+
       {/* Collapsible chord tones */}
-      <ChordTones chordName={sel}/>
+      <ChordTones chordName={nowChord}/>
     </div>
   );
 }
@@ -1257,52 +1467,186 @@ function PitchDetector({referenceNotes}) {
 
 // ─── Lyrics Coach ─────────────────────────────────────────────────────────────
 function LyricsCoach({lyrics,color,semitones,metro}) {
-  const [playing,setPlaying]=useState(false);
-  const [elapsed,setElapsed]=useState(0);
-  const [playingChord,setPlayingChord]=useState(null);
-  const startRef=useRef(null),rafRef=useRef(null),audioRef=useRef(null);
-  const tl=(lyrics?.chordTimeline||[]).map(e=>({...e,chord:tChord(e.chord,semitones)}));
-  const total=lyrics?Math.max(...lyrics.lines.flatMap(l=>l.timings))+2:0;
-  const stopPlay=useCallback(()=>{cancelAnimationFrame(rafRef.current);setPlaying(false);setElapsed(0);setPlayingChord(null);startRef.current=null;},[]);
-  const startPlay=()=>{
-    startRef.current=performance.now();setPlaying(true);
-    const tick=()=>{const e=(performance.now()-startRef.current)/1000;setElapsed(e);if(e<total)rafRef.current=requestAnimationFrame(tick);else stopPlay();};
-    rafRef.current=requestAnimationFrame(tick);
+  const [playing,    setPlaying]    = useState(false);
+  const [elapsed,    setElapsed]    = useState(0);
+  const [playingChord, setPlayingChord] = useState(null);
+  const [countIn,    setCountIn]    = useState(null); // null | 4 | 3 | 2 | 1
+  const [loopOn,     setLoopOn]     = useState(false);
+
+  const startRef   = useRef(null);
+  const rafRef     = useRef(null);
+  const audioRef   = useRef(null);
+  const timerRef   = useRef([]);
+  const loopRef    = useRef(false);
+  const startPlayRef = useRef(null); // stable ref for loop self-call
+
+  const setLoop = (v) => { loopRef.current = v; setLoopOn(v); };
+
+  const tl    = (lyrics?.chordTimeline||[]).map(e=>({...e,chord:tChord(e.chord,semitones)}));
+  const total = lyrics ? Math.max(...lyrics.lines.flatMap(l=>l.timings))+2 : 0;
+  const bpb   = 4; // 4/4 time
+  const bpm   = metro?.tempo || 116;
+
+  const stopPlay = useCallback(() => {
+    cancelAnimationFrame(rafRef.current);
+    timerRef.current.forEach(clearTimeout);
+    timerRef.current = [];
+    setPlaying(false); setElapsed(0); setPlayingChord(null);
+    setCountIn(null); startRef.current = null;
+  }, []);
+
+  const startPlay = useCallback(() => {
+    // Get or create AudioContext for count-in clicks
+    if (!audioRef.current) audioRef.current = getCtx();
+    const ctx = audioRef.current;
+    if (ctx.state === "suspended") ctx.resume();
+
+    const beatSec   = 60 / bpm;
+    const beatMs    = beatSec * 1000;
+    const countInMs = bpb * beatMs;
+    const audioNow  = ctx.currentTime;
+
+    // Clear previous
+    cancelAnimationFrame(rafRef.current);
+    timerRef.current.forEach(clearTimeout);
+    timerRef.current = [];
+    setElapsed(0); setPlayingChord(null); setCountIn(null);
+    setPlaying(true);
+
+    // Schedule count-in clicks on audio clock
+    for (let i = 0; i < bpb; i++) {
+      scheduleClick(ctx, audioNow + i * beatSec, i === 0);
+    }
+
+    // Visual countdown
+    for (let i = 0; i < bpb; i++) {
+      const t = setTimeout(() => setCountIn(bpb - i), i * beatMs);
+      timerRef.current.push(t);
+    }
+    timerRef.current.push(setTimeout(() => setCountIn(null), countInMs));
+
+    // Start RAF ticker after count-in
+    const tStart = setTimeout(() => {
+      startRef.current = performance.now();
+      const tick = () => {
+        const e = (performance.now() - startRef.current) / 1000;
+        setElapsed(e);
+        if (e < total) {
+          rafRef.current = requestAnimationFrame(tick);
+        } else {
+          cancelAnimationFrame(rafRef.current);
+          if (loopRef.current) {
+            startPlayRef.current && startPlayRef.current();
+          } else {
+            stopPlay();
+          }
+        }
+      };
+      rafRef.current = requestAnimationFrame(tick);
+    }, countInMs);
+    timerRef.current.push(tStart);
+  }, [bpm, total, stopPlay]);
+
+  // Keep startPlayRef current for loop self-call
+  useEffect(() => { startPlayRef.current = startPlay; }, [startPlay]);
+  useEffect(() => () => {
+    cancelAnimationFrame(rafRef.current);
+    timerRef.current.forEach(clearTimeout);
+  }, []);
+
+  const getActive = t => {
+    let a = null;
+    for (const e of tl) { if (t >= e.t) a = e.chord; else break; }
+    return a;
   };
-  useEffect(()=>()=>cancelAnimationFrame(rafRef.current),[]);
-  const getActive=t=>{let a=null;for(const e of tl){if(t>=e.t)a=e.chord;else break;}return a;};
-  const activeChord=playing?getActive(elapsed):null;
-  useEffect(()=>{
-    if(!playing||!activeChord||activeChord===playingChord)return;
+  const activeChord = playing && countIn === null ? getActive(elapsed) : null;
+
+  useEffect(() => {
+    if (!playing || !activeChord || activeChord === playingChord) return;
     setPlayingChord(activeChord);
-    if(!audioRef.current)audioRef.current=getCtx();
-    const ctx=audioRef.current;if(ctx.state==="suspended")ctx.resume();
-    playChord(ctx,chordMidi(activeChord),1.5);
-  },[activeChord,playing,playingChord]);
-  const getWS=(li,wi)=>{
-    if(!playing)return"idle";
-    const line=lyrics.lines[li];
-    const t=line.timings[wi],next=line.timings[wi+1]??(t+1.5);
-    if(elapsed>=t&&elapsed<next)return"active";
-    if(elapsed>=next)return"sung";
-    return"upcoming";
+    if (!audioRef.current) audioRef.current = getCtx();
+    const ctx = audioRef.current; if (ctx.state === "suspended") ctx.resume();
+    playChord(ctx, chordMidi(activeChord), 1.5);
+  }, [activeChord, playing, playingChord]);
+
+  const getWS = (li, wi) => {
+    if (!playing || countIn !== null) return "idle";
+    const line = lyrics.lines[li];
+    const t = line.timings[wi], next = line.timings[wi+1] ?? (t+1.5);
+    if (elapsed>=t && elapsed<next) return "active";
+    if (elapsed>=next) return "sung";
+    return "upcoming";
   };
-  const p=activeChord?parseChord(activeChord):null;
-  const meta=p?chordMeta(p.quality):{color:P.teal};
-  if(!lyrics) return <div style={{background:P.surface,borderRadius:12,padding:20,border:`1px solid ${P.border}`,textAlign:"center",marginBottom:16}}><div style={{fontSize:28,marginBottom:8}}>🎸</div><div style={{color:P.textSoft,fontSize:13}}>Instrumental — no lyrics.</div></div>;
+
+  const getChordAtWord = (li, wi) => {
+    const line = lyrics.lines[li];
+    const wordT = line.timings[wi];
+    let chordForWord = null;
+    for (const entry of tl) {
+      if (entry.t <= wordT+0.05) chordForWord = entry.chord;
+      else break;
+    }
+    if (!chordForWord) return null;
+    const entryIdx = tl.findIndex(e=>e.chord===chordForWord&&e.t<=wordT+0.05&&
+      (tl.indexOf(e)===tl.length-1||tl[tl.findIndex(e2=>e2===e)+1]?.t>wordT+0.05));
+    if (entryIdx < 0) return null;
+    const entry = tl[entryIdx];
+    const allTimings = lyrics.lines.flatMap((l,lIdx)=>l.timings.map((t,wIdx)=>({lIdx,wIdx,t})));
+    const afterEntry = allTimings.filter(x=>x.t>=entry.t-0.05);
+    if (!afterEntry.length) return null;
+    const closest = afterEntry.reduce((a,b)=>Math.abs(a.t-entry.t)<Math.abs(b.t-entry.t)?a:b);
+    if (closest.lIdx===li && closest.wIdx===wi) return chordForWord;
+    return null;
+  };
+
+  const p    = activeChord ? parseChord(activeChord) : null;
+  const meta = p ? chordMeta(p.quality) : {color:P.teal};
+
+  if (!lyrics) return (
+    <div style={{background:P.surface,borderRadius:12,padding:20,border:`1px solid ${P.border}`,textAlign:"center",marginBottom:16}}>
+      <div style={{fontSize:28,marginBottom:8}}>🎸</div>
+      <div style={{color:P.textSoft,fontSize:13}}>Instrumental — no lyrics.</div>
+    </div>
+  );
+
   return (
     <div style={{background:P.surface,border:`1px solid ${P.border}`,borderRadius:12,padding:18,marginBottom:16}}>
-      <style>{`@keyframes pd{from{transform:scaleY(0.5);opacity:0.4}to{transform:scaleY(1.4);opacity:1}}`}</style>
+      <style>{`@keyframes pd{from{transform:scaleY(0.5);opacity:0.4}to{transform:scaleY(1.4);opacity:1}}
+        @keyframes countPulse{0%{transform:scale(1);opacity:1}50%{transform:scale(1.2);opacity:0.8}100%{transform:scale(1);opacity:1}}`}
+      </style>
+
       <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:12}}>
         <div style={{color:P.muted,fontSize:11,fontWeight:700,letterSpacing:"0.1em"}}>LYRICS + CHORDS</div>
-        {playing&&<div style={{display:"flex",gap:4}}>{[0,1,2].map(i=><div key={i} style={{width:4,height:4,borderRadius:"50%",background:color,animation:`pd 0.8s ease-in-out ${i*0.2}s infinite alternate`}}/>)}</div>}
+        {playing && countIn===null && (
+          <div style={{display:"flex",gap:4}}>
+            {[0,1,2].map(i=>(
+              <div key={i} style={{width:4,height:4,borderRadius:"50%",background:color,animation:`pd 0.8s ease-in-out ${i*0.2}s infinite alternate`}}/>
+            ))}
+          </div>
+        )}
       </div>
-      <div style={{background:P.border,borderRadius:3,height:3,marginBottom:14}}>
-        <div style={{background:color,width:`${playing?(elapsed/total)*100:0}%`,height:"100%",borderRadius:3,transition:"width 0.1s linear"}}/>
-      </div>
-      {/* Live chord display */}
-      <div style={{marginBottom:14,background:P.card,borderRadius:10,border:`1px solid ${activeChord?meta.color+"55":P.border}`,padding:"11px 15px",minHeight:60,transition:"border-color 0.2s"}}>
-        {activeChord?(
+
+      {/* Progress bar / Count-in display */}
+      {countIn !== null ? (
+        <div style={{height:36,display:"flex",alignItems:"center",justifyContent:"center",
+          marginBottom:14,background:P.card,borderRadius:8,border:`1px solid ${P.accent}44`}}>
+          <span style={{color:P.accent,fontSize:28,fontWeight:900,lineHeight:1,
+            animation:"countPulse 0.4s ease-in-out"}}>
+            {countIn}
+          </span>
+          <span style={{color:P.muted,fontSize:13,marginLeft:6}}>…</span>
+        </div>
+      ) : (
+        <div style={{background:P.border,borderRadius:3,height:3,marginBottom:14}}>
+          <div style={{background:color,width:`${playing?(elapsed/total)*100:0}%`,height:"100%",borderRadius:3,transition:"width 0.1s linear"}}/>
+        </div>
+      )}
+
+      {/* Live active chord display */}
+      <div style={{marginBottom:14,background:P.card,borderRadius:10,
+        border:`1px solid ${activeChord?meta.color+"55":P.border}`,
+        padding:"11px 15px",minHeight:60,transition:"border-color 0.2s"}}>
+        {activeChord ? (
           <div style={{display:"flex",alignItems:"center",gap:12,flexWrap:"wrap"}}>
             <div style={{textAlign:"center",minWidth:50}}>
               <div style={{color:meta.color,fontSize:28,fontWeight:900,lineHeight:1}}>{activeChord}</div>
@@ -1317,43 +1661,76 @@ function LyricsCoach({lyrics,color,semitones,metro}) {
               ))}
             </div>
           </div>
-        ):<div style={{color:P.muted,fontSize:13,textAlign:"center",paddingTop:6}}>{playing?"…":"Press play — chords shown as they change"}</div>}
+        ) : (
+          <div style={{color:P.muted,fontSize:13,textAlign:"center",paddingTop:6}}>
+            {countIn!==null ? "Get ready…" : playing ? "…" : "Press play — chords shown as they change"}
+          </div>
+        )}
       </div>
-      {/* Chord map */}
-      <div style={{marginBottom:14}}>
-        <div style={{color:P.muted,fontSize:10,fontWeight:700,letterSpacing:"0.1em",marginBottom:6}}>CHORD MAP</div>
-        <div style={{display:"flex",gap:4,flexWrap:"wrap"}}>
-          {tl.map((entry,i)=>{
-            const isAct=activeChord===entry.chord&&elapsed>=entry.t&&(i===tl.length-1||elapsed<tl[i+1].t);
-            const isPast=elapsed>entry.t&&!isAct;
-            const p2=parseChord(entry.chord),m=p2?chordMeta(p2.quality):{color:P.teal};
-            return (
-              <div key={i} style={{padding:"4px 9px",borderRadius:7,background:isAct?m.color+"33":isPast?P.bg:P.card,border:`1px solid ${isAct?m.color:P.border}`,transition:"all 0.15s"}}>
-                <div style={{color:isAct?m.color:isPast?P.muted:P.textSoft,fontSize:12,fontWeight:isAct?800:600}}>{entry.chord}</div>
-                <div style={{color:P.muted,fontSize:9}}>{entry.t.toFixed(1)}s</div>
-              </div>
-            );
-          })}
-        </div>
-      </div>
-      {/* Lyrics */}
+
+      {/* Lyrics with inline chord pills above words */}
       <div style={{marginBottom:14}}>
         {lyrics.lines.map((line,li)=>(
-          <div key={li} style={{marginBottom:11,display:"flex",flexWrap:"wrap",gap:"0 7px"}}>
-            {line.words.map((word,wi)=>{
-              const st=getWS(li,wi);
-              return <span key={wi} style={{fontSize:17,fontWeight:st==="active"?800:500,color:st==="active"?color:st==="sung"?P.muted:P.text,transition:"color 0.1s",textShadow:st==="active"?`0 0 10px ${color}88`:"none",display:"inline-block",borderBottom:st==="active"?`2px solid ${color}`:"2px solid transparent",transform:st==="active"?"scale(1.05)":"scale(1)"}}>{word}</span>;
-            })}
+          <div key={li} style={{marginBottom:16}}>
+            <div style={{display:"flex",flexWrap:"wrap",gap:"0 8px",alignItems:"flex-end"}}>
+              {line.words.map((word,wi)=>{
+                const st = getWS(li,wi);
+                const chordPill = getChordAtWord(li,wi);
+                const pm = chordPill ? parseChord(chordPill) : null;
+                const pillMeta = pm ? chordMeta(pm.quality) : {color:P.teal};
+                const isActiveWord = st==="active";
+                const isActiveChordPill = chordPill && activeChord===chordPill;
+                return (
+                  <div key={wi} style={{display:"inline-flex",flexDirection:"column",alignItems:"center",marginBottom:2}}>
+                    <div style={{
+                      fontSize:10,fontWeight:800,padding:"1px 6px",borderRadius:5,marginBottom:3,
+                      background:chordPill?(isActiveChordPill?pillMeta.color+"44":pillMeta.color+"22"):"transparent",
+                      color:chordPill?(isActiveChordPill?pillMeta.color:pillMeta.color+"bb"):"transparent",
+                      border:chordPill?`1px solid ${isActiveChordPill?pillMeta.color:pillMeta.color+"55"}`:"1px solid transparent",
+                      transition:"all 0.15s",whiteSpace:"nowrap",
+                    }}>{chordPill||"​"}</div>
+                    <span style={{
+                      fontSize:17,fontWeight:isActiveWord?800:500,
+                      color:isActiveWord?color:st==="sung"?P.muted:P.text,
+                      transition:"color 0.1s",
+                      textShadow:isActiveWord?`0 0 10px ${color}88`:"none",
+                      display:"inline-block",
+                      borderBottom:isActiveWord?`2px solid ${color}`:"2px solid transparent",
+                      transform:isActiveWord?"scale(1.05)":"scale(1)",
+                    }}>{word}</span>
+                  </div>
+                );
+              })}
+            </div>
           </div>
         ))}
       </div>
+
+      {/* Tip */}
       <div style={{background:P.card,borderRadius:8,padding:"9px 13px",border:`1px solid ${P.border}`,marginBottom:12}}>
         <span style={{color:P.accent,fontSize:11,fontWeight:700}}>TIP  </span>
         <span style={{color:P.textSoft,fontSize:12}}>{lyrics.tip}</span>
       </div>
-      <button onClick={playing?stopPlay:startPlay} style={{width:"100%",padding:"10px 0",borderRadius:8,fontWeight:800,fontSize:13,border:"none",cursor:"pointer",background:playing?P.red+"cc":color,color:"#0a0a0f",transition:"background 0.2s"}}>
-        {playing?"■ STOP":"▶ SING ALONG — START TIMING"}
-      </button>
+
+      {/* Controls row */}
+      <div style={{display:"flex",gap:8,alignItems:"stretch"}}>
+        <button
+          onClick={playing ? stopPlay : startPlay}
+          style={{flex:1,padding:"10px 0",borderRadius:8,fontWeight:800,fontSize:13,
+            border:"none",cursor:"pointer",
+            background:playing?P.red+"cc":color,color:"#0a0a0f",transition:"background 0.2s"}}>
+          {playing ? "■ STOP" : "▶ SING ALONG"}
+        </button>
+        <button
+          onClick={() => setLoop(!loopOn)}
+          title={loopOn ? "Loop on — click to turn off" : "Loop off — click to turn on"}
+          style={{padding:"10px 14px",borderRadius:8,cursor:"pointer",fontWeight:800,fontSize:12,
+            border:`1px solid ${loopOn ? P.purple : P.border}`,
+            background:loopOn ? P.purple+"33" : "transparent",
+            color:loopOn ? P.purple : P.muted,transition:"all 0.15s"}}>
+          🔁
+        </button>
+      </div>
     </div>
   );
 }
@@ -1498,7 +1875,12 @@ function SectionDetail({section,onMarkMastered,isMobile,metro,semitones}) {
         <div>
           <MiniMetro metro={metro} onGoTo={()=>setTab("metronome")}/>
           <p style={{color:P.textSoft,fontSize:13,lineHeight:1.7,marginBottom:14}}>{section.technique}</p>
-          <ChordExplorer chords={section.chords} semitones={semitones} bpm={metro.tempo}/>
+          <ChordExplorer
+            chords={section.chords}
+            semitones={semitones}
+            bpm={metro.tempo}
+            lineGroups={section.lyrics?.lineGroups || null}
+          />
         </div>
       )}
       {tab==="riffs"&&(
