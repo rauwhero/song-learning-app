@@ -8,7 +8,7 @@ import { ContinueBanner, SongHeader, ProgressHero, CollapsibleRefs } from "./com
 import { RunThrough, SectionDetail, SectionCard } from "./components/song/SongComponents";
 import { SongLibrary } from "./components/library/LibraryComponents";
 
-export default function SongCraft() {
+export default function Woodshed() {
   const [customSongs,  setCustomSongs]  = useState(() => ls.load(LS_SONGS, []));
   const [allProgress,  setAllProgress]  = useState(() => ls.load(LS_PROGRESS, {}));
   const [allSemitones, setAllSemitones] = useState(() => ls.load(LS_SEMIS, {}));
@@ -92,10 +92,9 @@ export default function SongCraft() {
         ls.save(LS_PROGRESS, next); return next;
       });
     }
-    // Start at 50% tempo — standard safe starting practice speed
+    // Set practice tempo to 50% but do NOT auto-start — user starts metronome manually
     const practiceBpm = Math.round((activeSong?.bpm || 116) * 0.5);
     metro.setTempo(practiceBpm);
-    if (!metro.running) metro.start();
     setActiveSecId(section.id);
     if (isMobile) setShowDetail(true);
   }, [activeSong, metro, isMobile]);
@@ -111,10 +110,10 @@ export default function SongCraft() {
         <div style={{ maxWidth:1140, margin:"0 auto", display:"flex", alignItems:"center",
           justifyContent:"space-between", height:52 }}>
           <div style={{ display:"flex", alignItems:"center", gap:10, minWidth:0, flex:1, overflow:"hidden" }}>
-            <span style={{ color:P.accent, fontSize:20, flexShrink:0 }}>♫</span>
+            <span style={{ color:P.accent, fontSize:20, flexShrink:0 }}>🪵</span>
             <button onClick={() => { setView("library"); setRunThrough(false); }}
               style={{ fontWeight:800, fontSize:14, background:"none", border:"none",
-                color:P.text, cursor:"pointer", padding:0, flexShrink:0 }}>SongCraft</button>
+                color:P.text, cursor:"pointer", padding:0, flexShrink:0 }}>Woodshed</button>
             {activeSong && !isMobile && (
               <>
                 <span style={{ color:P.border, flexShrink:0 }}>|</span>

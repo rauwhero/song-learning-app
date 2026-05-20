@@ -1,7 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { P } from "../../lib/constants";
 import { getCtx, detectPitch, freqToNote, scorePitch } from "../../audio/index";
-import { tChord, chordTones, parseChord, chordMeta } from "../../theory/index";
 
 // ── MetronomePanel ────────────────────────────────────────────────────────────
 export function MetronomePanel({ metro }) {
@@ -188,16 +187,14 @@ export function PitchDetector({ referenceNotes }) {
 
 // ── LyricsCoach ───────────────────────────────────────────────────────────────
 export function LyricsCoach({ lyrics, color, semitones, metro }) {
-  const [playing,      setPlaying]     = useState(false);
-  const [elapsed,      setElapsed]     = useState(0);
-  const [playingChord, setPlayingChord] = useState(null);
+  const [playing, setPlaying] = useState(false);
+  const [elapsed, setElapsed] = useState(0);
   const startRef = useRef(null), rafRef = useRef(null);
-  const tl = (lyrics?.chordTimeline || []).map(e => ({ ...e, chord:tChord(e.chord, semitones) }));
   const total = lyrics ? Math.max(...lyrics.lines.flatMap(l => l.timings)) + 2 : 0;
 
   const stopPlay = useCallback(() => {
     cancelAnimationFrame(rafRef.current);
-    setPlaying(false); setElapsed(0); setPlayingChord(null);
+    setPlaying(false); setElapsed(0);
     startRef.current = null;
   }, []);
 
@@ -206,11 +203,6 @@ export function LyricsCoach({ lyrics, color, semitones, metro }) {
     const tick = () => {
       const e = (performance.now() - startRef.current) / 1000;
       setElapsed(e);
-      // Advance chord based on timeline
-      const active = [...tl].reverse().find(ev => ev.t <= e);
-      if (active) {
-        setPlayingChord(active.chord);
-      }
       if (e < total) rafRef.current = requestAnimationFrame(tick); else stopPlay();
     };
     rafRef.current = requestAnimationFrame(tick);
@@ -236,33 +228,9 @@ export function LyricsCoach({ lyrics, color, semitones, metro }) {
     return "upcoming";
   };
 
-  const activeTone = playingChord ? chordTones(playingChord) : [];
-  const activeMeta = playingChord ? chordMeta(parseChord(playingChord)?.quality || "") : null;
-
   return (
     <div style={{ background:P.surface, border:`1px solid ${P.border}`, borderRadius:12, padding:18, marginBottom:14 }}>
       <div style={{ color:P.muted, fontSize:11, fontWeight:700, letterSpacing:"0.1em", marginBottom:12 }}>LYRICS COACH</div>
-
-      {/* Live chord display */}
-      {playing && playingChord && (
-        <div style={{ background:P.card, borderRadius:10, padding:"10px 14px",
-          border:`1px solid ${activeMeta?.color || color}44`, marginBottom:12 }}>
-          <div style={{ display:"flex", alignItems:"center", gap:8, marginBottom:6 }}>
-            <span style={{ color:activeMeta?.color || color, fontSize:20, fontWeight:800 }}>{playingChord}</span>
-            <span style={{ color:P.muted, fontSize:11 }}>{activeMeta?.type}</span>
-          </div>
-          <div style={{ display:"flex", gap:5, flexWrap:"wrap" }}>
-            {activeTone.map((t, i) => (
-              <span key={i} style={{ background:(activeMeta?.color || color)+"22",
-                color:activeMeta?.color || color, fontSize:11, fontWeight:700,
-                padding:"2px 8px", borderRadius:6,
-                border:`1px solid ${(activeMeta?.color||color)}44` }}>
-                {t.note}<span style={{ fontSize:9, opacity:0.7 }}> {t.deg}</span>
-              </span>
-            ))}
-          </div>
-        </div>
-      )}
 
       {/* Lyrics lines */}
       <div style={{ marginBottom:14 }}>
